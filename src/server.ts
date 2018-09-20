@@ -3,11 +3,22 @@ import path from "path";
 import mysql from 'mysql';
 import bodyParser from 'body-parser';
 import { ServerResponse, ServerRequest, ClientRequest } from "http";
+import expressSession from 'express-session';
+import sessionStore from 'memorystore';
+
+const memoryStore = sessionStore(expressSession);
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.text());
+
+app.use(expressSession({
+  secret: 'waffle',
+  store: new memoryStore({
+    checkPeriod: 86400000 // prune expired entries every 24h
+  })
+}))
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -69,7 +80,7 @@ app.get('/data', function(req: ServerRequest, res: ServerResponse) {
     res.end(JSON.stringify(respObjects));
   })
 })
-
+//sort by id and data time
 app.get('/events', function(req: ServerRequest, res: ServerResponse) {
   let respObjects: any[] = [];
   dbConnection.query(`select * from eventsList order by date, time;`, function(err: any, results: any, fields: any) {
@@ -79,6 +90,7 @@ app.get('/events', function(req: ServerRequest, res: ServerResponse) {
       eventObject.id = entry.id;
       eventObject.time = entry.time;
       eventObject.date = entry.date;
+      eventObject.patternId = entry.patternId;
       respObjects.push(eventObject);
     })
     res.end(JSON.stringify(respObjects));
@@ -94,7 +106,7 @@ app.post('/pattern', function(req: any, res: ServerResponse) {
     
   })
 })
-
+/*
 app.post('/events',function(req: any, res: ServerResponse) {
   let events: any = req.body;
   console.log(events);
@@ -104,14 +116,14 @@ app.post('/events',function(req: any, res: ServerResponse) {
     
     })
   })
-})
+}) */
 
 app.delete('/pattern/*',function(req: any, res: ServerResponse) {
   let patternId: string[] = [];
   patternId.push(req.params[0]);
   console.log(patternId);
   dbConnection.query(`DELETE eventPattern, eventsList, eventVisitors, visitors FROM eventPattern
-                      INNER JOIN eventList ON eventPattern.id = eventsList.patternId
+                      INNER JOIN eventsList ON eventPattern.id = eventsList.patternId
                       inner join eventVisitors on eventsList.id = eventVisitors.eventId
                       inner join visitors on eventVisitors.visitorId = visitors.id
                       WHERE eventPattern.id=?`, patternId, function(err: any, results: any, fields: any) {
@@ -133,9 +145,16 @@ app.delete('/event/*',function(req: any, res: ServerResponse) {
   })
 })
 
-
-
-  
+app.post('/event',function(req: any, res: ServerResponse) {
+  let event = req.body;
+  console.log(req.body);
+  console.log(event.time +"" + event.date);
+  dbConnection.query(`insert into eventsList SET ?
+                      ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`, [event, event.time, event.date, event.patternId] , function(err: any, results: any, fields: any) {
+    if(err) throw err;
+    console.log("updated")
+  })
+})
 
 app.listen(8130, () => {
     console.log('wat up');

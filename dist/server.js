@@ -7,9 +7,18 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const mysql_1 = __importDefault(require("mysql"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const express_session_1 = __importDefault(require("express-session"));
+const memorystore_1 = __importDefault(require("memorystore"));
+const memoryStore = memorystore_1.default(express_session_1.default);
 const app = express_1.default();
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.text());
+app.use(express_session_1.default({
+    secret: 'waffle',
+    store: new memoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    })
+}));
 app.use(express_1.default.static(path_1.default.join(__dirname, "public")));
 const dbConnection = mysql_1.default.createConnection({
     host: '127.0.0.1',
@@ -67,6 +76,7 @@ app.get('/data', function (req, res) {
         res.end(JSON.stringify(respObjects));
     });
 });
+//sort by id and data time
 app.get('/events', function (req, res) {
     let respObjects = [];
     dbConnection.query(`select * from eventsList order by date, time;`, function (err, results, fields) {
@@ -77,6 +87,7 @@ app.get('/events', function (req, res) {
             eventObject.id = entry.id;
             eventObject.time = entry.time;
             eventObject.date = entry.date;
+            eventObject.patternId = entry.patternId;
             respObjects.push(eventObject);
         });
         res.end(JSON.stringify(respObjects));
@@ -90,22 +101,23 @@ app.post('/pattern', function (req, res) {
             throw err;
     });
 });
-app.post('/events', function (req, res) {
-    let events = req.body;
-    console.log(events);
-    events.forEach(function (entry) {
-        dbConnection.query(`INSERT INTO eventsList SET ?`, entry, function (err, results, fields) {
-            if (err)
-                throw err;
-        });
-    });
-});
+/*
+app.post('/events',function(req: any, res: ServerResponse) {
+  let events: any = req.body;
+  console.log(events);
+  events.forEach(function(entry: any) {
+    dbConnection.query(`INSERT INTO eventsList SET ?`, entry, function(err: any, results: any, fields: any) {
+      if(err) throw err;
+    
+    })
+  })
+}) */
 app.delete('/pattern/*', function (req, res) {
     let patternId = [];
     patternId.push(req.params[0]);
     console.log(patternId);
     dbConnection.query(`DELETE eventPattern, eventsList, eventVisitors, visitors FROM eventPattern
-                      INNER JOIN eventList ON eventPattern.id = eventsList.patternId
+                      INNER JOIN eventsList ON eventPattern.id = eventsList.patternId
                       inner join eventVisitors on eventsList.id = eventVisitors.eventId
                       inner join visitors on eventVisitors.visitorId = visitors.id
                       WHERE eventPattern.id=?`, patternId, function (err, results, fields) {
@@ -125,6 +137,17 @@ app.delete('/event/*', function (req, res) {
         if (err)
             throw err;
         console.log("destroyed");
+    });
+});
+app.post('/event', function (req, res) {
+    let event = req.body;
+    console.log(req.body);
+    console.log(event.time + "" + event.date);
+    dbConnection.query(`insert into eventsList SET ?
+                      ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`, [event, event.time, event.date, event.patternId], function (err, results, fields) {
+        if (err)
+            throw err;
+        console.log("updated");
     });
 });
 app.listen(8130, () => {
