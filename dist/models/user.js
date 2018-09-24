@@ -35,11 +35,12 @@ exports.validateUser = (req, res) => {
 exports.sendScheduledEvents = (req, res) => {
     let scheduledEvents = [];
     exports.dbConnect.query(`select visitors.name, visitors.email, eventsList.date, eventsList.time, eventPattern.type, eventPattern.number,
-                        eventPattern.duration, eventPattern.description from holandly.eventVisitors
-                        inner join visitors on eventVisitors.visitorId = visitors.id
-                        inner join eventsList on eventVisitors.eventId = eventsList.id
-                        inner join eventPattern on eventsList.patternId = eventPattern.id
-                        order by eventsList.date, eventsList.time;`, function (err, results, fields) {
+                eventPattern.duration, eventPattern.description, visitCount.occupied from holandly.eventVisitors
+                inner join visitors on eventVisitors.visitorId = visitors.id
+                inner join eventsList on eventVisitors.eventId = eventsList.id
+                inner join eventPattern on eventsList.patternId = eventPattern.id
+                left join (select eventId, COUNT(*) AS occupied from eventVisitors group by eventId) AS visitCount on eventsList.id = visitCount.eventId
+                order by eventsList.date, eventsList.time;`, function (err, results, fields) {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
@@ -54,6 +55,7 @@ exports.sendScheduledEvents = (req, res) => {
                 event.number = entry.number;
                 event.duration = entry.duration;
                 event.description = entry.description;
+                event.occupied = entry.occupied;
                 scheduledEvents.push(event);
             });
             res.send(JSON.stringify(scheduledEvents));
@@ -61,6 +63,7 @@ exports.sendScheduledEvents = (req, res) => {
     });
 };
 exports.sendEventPatterns = (req, res) => {
+    console.log("eventPatterns sent");
     let respObjects = [];
     exports.dbConnect.query(`select * from eventPattern;`, function (err, results, fields) {
         if (err) {
@@ -82,7 +85,10 @@ exports.sendEventPatterns = (req, res) => {
 };
 exports.sendAvailableEvents = (req, res) => {
     let respObjects = [];
-    exports.dbConnect.query(`select * from eventsList order by id, date, time;`, function (err, results, fields) {
+    exports.dbConnect.query(`select eventsList.*, visitCount.occupied, eventPattern.number, eventPattern.type from holandly.eventsList
+                      inner join eventPattern on eventsList.patternId = eventPattern.id
+                      left join (select eventId, COUNT(*) AS occupied from eventVisitors group by eventId) AS visitCount on eventsList.id = visitCount.eventId
+                      order by date, time;`, function (err, results, fields) {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
@@ -91,8 +97,12 @@ exports.sendAvailableEvents = (req, res) => {
                 let eventObject = {};
                 eventObject.id = entry.id;
                 eventObject.time = entry.time;
+                eventObject.type = entry.type;
+                console.log(entry.date);
                 eventObject.date = entry.date;
                 eventObject.patternId = entry.patternId;
+                eventObject.occupied = entry.occupied;
+                eventObject.number = entry.number;
                 respObjects.push(eventObject);
             });
             res.end(JSON.stringify(respObjects));
@@ -106,6 +116,9 @@ exports.addNewEventPattern = (req, res) => {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
+        else {
+            res.end("Successfull");
+        }
     });
 };
 exports.deleteEventPattern = (req, res) => {
@@ -114,6 +127,9 @@ exports.deleteEventPattern = (req, res) => {
     exports.dbConnect.query(`delete from eventPattern where eventPattern.id = ?`, patternId, function (err, results, fields) {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
+        }
+        else {
+            res.end("Successfull");
         }
     });
 };
@@ -124,6 +140,9 @@ exports.deleteEvent = (req, res) => {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
+        else {
+            res.end("Successfull");
+        }
     });
 };
 exports.addEvent = (req, res) => {
@@ -133,6 +152,9 @@ exports.addEvent = (req, res) => {
     exports.dbConnect.query(`insert into eventsList SET ? ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`, [event, event.time, event.date, event.patternId], function (err, results, fields) {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
+        }
+        else {
+            res.end("Successfull");
         }
     });
 };

@@ -55,155 +55,13 @@ window.onload = function () {
     })
     getPatterns();
     getEvents();
-    getVisitors();
+    deleteEvent(1);
 };
 
-function getVisitors() {
-    $.ajax({
-        type: 'get',
-        url: '/scheduled',
-        dataType: 'json',
-        headers: {
-            "Authorization": "Basic " + btoa('user' + ':' + 'passw')
-        },
-        data: {},
-        response: 'json',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', "Basic " + btoa('user' + ':' + 'passw'))
-        },
-        success: function (data) {
-            console.log(data);
-            makeVisitorsList(data);
-        }
-    });
+function TabsSelect() {
+    var penel = document.getElementById('pattern');
+    penel.hidden = true;
 }
-
-function makeVisitorsList(data) {
-    let visitorsField = document.getElementById('div-dashboard');
-    visitorsField.innerHTML = '';
-    let eventAmount = 0;
-    for (let i = 0; i < data.length; i++) {
-
-        let DayEvents = $('#dateEvent' + data[i].date);
-        if (DayEvents.length === 0) {
-
-            DayEvents = document.createElement('div');
-            DayEvents.id = 'dateEvent' + data[i].date;
-            DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-            DayEvents.innerHTML =
-                '<strong>' + data[i].date + '</strong><hr>';
-            visitorsField.appendChild(DayEvents);
-        }
-        else
-            DayEvents = DayEvents[0];
-
-        let TimeEvent = document.createElement('div');
-        TimeEvent.classList.add("accordion");
-        TimeEvent.id = 'idDayVisitorsList' + data[i].date;
-        TimeEvent.innerHTML +=
-            '<div class="card">' +
-            '<div class="card-header" id="headingOne">' +
-            '<div class="row ">' +
-            '<div class="col-3">' +
-            data[i].time + '/' + data[i].duration +
-            '</div>' +
-            '<div class="col-3"><strong>' +
-            data[i].type +
-            '</strong></div>' +
-            '<div class="col-3">' +
-            data[i].number +
-            '</div>' +
-            '<div class="col text-right">' +
-            '<a href="#" data-toggle="collapse"' +
-            'data-target="#collapseOne" aria-expanded="false"' +
-            'aria-controls="collapseOne">Дополнительно</a>' +
-            '</div>' +
-            '</div>' +
-            '</div>';
-        TimeEvent.innerHTML += '<div id="collapseOne" class="collapse " aria-labelledby="headingOne"' +
-            '                             data-parent="#accordionVisitorsList">' +
-            '                            <div class="container align-items-center">' +
-            '                                <div class="row ">' +
-            '                                    <div class="col-3 align-self-center">' +
-            '                                        <div class="btn-group-vertical">' +
-            '                                            <button type="button" class="btn btn-outline-success">' +
-            '                                                Перепланировать' +
-            '                                            </button>' +
-            '                                            <button type="button" class="btn btn-outline-info ">' +
-            '                                                Отменить' +
-            '                                            </button>' +
-            '                                        </div>' +
-            '                                    </div>' +
-            '                                    <div class="col-7 ">' +
-            '                                        <table class="table table-sm">' +
-            '                                            <thead>' +
-            '                                            <tr>' +
-            '                                                <th scope="col">#</th>' +
-            '                                                <th scope="col">Имя</th>' +
-            '                                                <th scope="col">E-mail</th>' +
-            '                                                <th scope="col">Отмена участия</th>' +
-            '                                            </tr>' +
-            '                                            </thead>' +
-            '                                            <tbody>' +
-            '                                            <tr>' +
-            '                                                <th scope="row">1</th>' +
-            '                                                <td>Mark fh dfhg</td>' +
-            '                                                <td>Otto</td>' +
-            '                                                <td>' +
-            '                                                    <button type="button" class="btn btn-link">Отменить участие\n' +
-            '                                                    </button>' +
-            '                                                </td>' +
-            '                                            </tr>' +
-            '                                            <tr>' +
-            '                                                <th scope="row">2</th>' +
-            '                                                <td>Jacob</td>' +
-            '                                                <td>Thornton</td>' +
-            '                                                <td>' +
-            '                                                    <button type="button" class="btn btn-link">Отменить участие\n' +
-            '                                                    </button>' +
-            '                                                </td>' +
-            '                                            </tr>' +
-            '                                            </tbody>' +
-            '                                        </table>' +
-            '                                    </div>' +
-            '                                </div>' +
-            '                            </div>' +
-            '                        </div>';
-        DayEvents.appendChild(TimeEvent);
-    }
-    if (data.length > 0)
-        document.getElementById('visitor-amount').innerText = data.length;
-    $("#div-event .updateEvent").click(
-        function () {
-            console.log(this.parentNode.parentNode.data);
-            //updateEvent(this.parentNode.parentNode.data);
-
-            $("#modalPatternId").val(this.parentNode.parentNode.data.patternId);
-            $("#modalEventId").val(this.parentNode.parentNode.data.eventId);
-            $("input#inputDate").val(this.parentNode.parentNode.data.eventDate);
-            $("#inputTime").val(this.parentNode.parentNode.data.eventTime);
-
-        }
-    );
-
-    $("#div-event .delEvent").click(
-        function () {
-            console.log(this.parentNode.parentNode.data.eventId);
-            deleteEvent(this.parentNode.parentNode.data.eventId);
-        }
-    );
-}
-
-function elementDayEvent(dayData) {
-    let DayEvents = document.createElement('div');
-    DayEvents.id = 'dateEvent' + dayData.date;
-    DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-    DayEvents.innerHTML =
-        '<strong>' + dayData.date + '</strong><hr>';
-
-    return DayEvents;
-}
-
 
 function getEvents() {
     $.ajax({
@@ -239,7 +97,7 @@ function makeEventsPoint(data) {
             let type = $('#pattern' + data[i].patternId);
             PatternEvent.innerHTML =
                 ' <div className="alert alert-success text-left" role="alert">' +
-                '<strong>' + data[i].type + '</strong><hr>';
+                '<strong>' + type[0].data.patternType + '</strong><hr>';
             eventField.appendChild(PatternEvent);
             eventAmount++;
         }
@@ -249,22 +107,17 @@ function makeEventsPoint(data) {
         let eventCard = document.createElement('div');
         eventCard.classList.add("btn-group");
         eventCard.role = "group";
-        eventCard.data = {
-            patternId: data[i].patternId,
-            eventId: data[i].id,
-            eventTime: data[i].time,
-            eventDate: data[i].date
-        };
+        eventCard.data = {patternId: data[i].patternId, eventId: data[i].id};
         eventCard.innerHTML +=
             '<button id="btnGroupDrop2" type="button" class="btn btn-outline-dark dropdown-toggle"' +
             '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-            moment(data[i].date).format('DD MM YYYY') + '<br/>' +
+            data[i].date + '<br/>' +
             data[i].time + '<br/>' +
             'Своб.8/6' +
             '</button>';
         eventCard.innerHTML +=
             '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-            '<a class="dropdown-item updateEvent" href="#" data-toggle="modal" data-target="#newEventModal">Перепланировать</a>' +
+            '<a class="dropdown-item updateEvent" href="#">Перепланировать</a>' +
             '<a class="dropdown-item delEvent" href="#">Отменить</a>' +
             '</div>';
         PatternEvent.appendChild(eventCard);
@@ -278,9 +131,6 @@ function makeEventsPoint(data) {
 
             $("#modalPatternId").val(this.parentNode.parentNode.data.patternId);
             $("#modalEventId").val(this.parentNode.parentNode.data.eventId);
-            $("input#inputDate").val(this.parentNode.parentNode.data.eventDate);
-            $("#inputTime").val(this.parentNode.parentNode.data.eventTime);
-
         }
     );
 
@@ -330,6 +180,21 @@ function deleteEvent(id) {
     });
 }
 
+function updateEvent(evenObj) {
+    $("#modalPatternId").val(evenObj.patternId);
+    $("#modalEventId").val(evenObj.eventId);
+    event.patternID = $("#modalPatternId").val();
+    event.date = $("input#inputDate").val();
+    event.time = $("#inputTime").val();
+    event.patternID = $("#modalEvent").val();
+    event.date = $("input#inputDate").val();
+    event.time = $("#inputTime").val();
+    var events = [];
+    events.push(event);
+    console.log(events);
+    putEvent(events);
+}
+
 function newEvent() {
     let event = {
         "patternID": 0,
@@ -350,7 +215,7 @@ function newEvent() {
 function getPatterns() {
     $.ajax({
         type: 'get',
-        url: '/data',
+        url: '/pattern',
         // url: 'http://andrey.4.holateam.io:8130/data',
         dataType: 'json',
         username: 'ub',
@@ -442,7 +307,6 @@ function newPattern() {
 }
 
 function deletePattern(id) {
-    console.log(id);
     $.ajax({
         type: "delete",
         url: '/pattern/' + id,

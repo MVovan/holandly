@@ -10,7 +10,11 @@
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js'></script>
     <script src="js/personal.js"></script>
+    <script>
+        moment().format('YYYY MM DD');
+    </script>
 
 </head>
 <body style="margin: 1%">
@@ -23,10 +27,10 @@
                 <h4 class=" mt-1 mb-1 text-left">HOLANDLY </h4>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-warning active" id="dashboard-tab" data-toggle="tab" href="#dashboard"
+                <a class="nav-link text-warning active" id="dashboard-tab" data-toggle="tab" href="#div-dashboard"
                    role="tab" aria-controls="dashboard" aria-selected="true">
                     События
-                    <span class="badge badge-warning " visitor-amount""></span></a>
+                    <span class="badge badge-warning" id="visitor-amount"></span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-success" id="event-tab" data-toggle="tab" href="#eventBoard" role="tab"
@@ -46,8 +50,8 @@
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Пользователь
                     </button>
-                    <div id="out" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="" >Выход</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Выход</a>
                     </div>
                 </div>
                 <!--<a class="nav-link text-info" id="logout-tab" data-toggle="tab" href="#logout" role="tab"-->
@@ -60,78 +64,242 @@
     <!-- BODY Main menu -->
     <div class="tab-content" id="myTabContent" style="margin: 2%">
         <!-- dashboard------------------------------------->
-        <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
-            <div id="div-dashboard">
-
-
-                <div class="accordion" id="accordionExample">
-
+        <div class="tab-pane fade show active text-left" id="div-dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+            <!--<div id="div-dashboard">-->
+            <div class="shadow-lg p-3 mb-5 bg-white rounded">
+                <strong>27 sep 2018</strong>
+                <hr>
+                <div class="accordion" id="accordionVisitorsList">
                     <div class="card">
                         <div class="card-header" id="headingOne">
-                            <h6 class="mb-1">
-
-                                <strong class="text-left">15:00 27 sep 2018</strong> Встреча c RRR fff@ggg.maol
-                                <small class="text-muted">3 days ago</small>
-                                <button class="btn btn-link close" type="button" data-toggle="collapse"
-                                        data-target="#collapseOne" aria-expanded="false"
-                                        aria-controls="collapseOne">
-
-                                    <h6>Дополнительно</h6>
-                                </button>
-                            </h6>
+                            <div class="row ">
+                                <div class="col-3">
+                                    15:00-15:30
+                                </div>
+                                <div class="col-3"><strong>
+                                    Examine CSb
+                                </strong></div>
+                                <div class="col-3">
+                                    Signd 5 of 8
+                                </div>
+                                <div class="col text-right">
+                                    <a href="#" data-toggle="collapse"
+                                       data-target="#collapseOne" aria-expanded="false"
+                                       aria-controls="collapseOne">Дополнительно</a>
+                                </div>
+                            </div>
                         </div>
 
-                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
-                             data-parent="#accordionExample">
-                            <div class="card-body">
-                                Note that depending on how they are used, badges may be confusing for users of
-                                screen
-                                readers and similar assistive technologies. While the styling of badges provides a
-                                visual cue as to their purpose, these users will simply be presented with the
-                                content of
-                                the badge. Depending on the specific situation, these badges may seem like random
-                                additional words or numbers at the end of a sentence, link, or button.
+                        <div id="collapseOne" class="collapse " aria-labelledby="headingOne"
+                             data-parent="#accordionVisitorsList">
+                            <div class="container align-items-center">
+                                <div class="row ">
+                                    <div class="col-3 align-self-center">
+                                        <div class="btn-group-vertical">
+                                            <button type="button" class="btn btn-outline-success">
+                                                Перепланировать
+                                            </button>
 
-                                <div class="alert alert-primary" role="alert">erert</div>
-                                <button type="button" class="btn btn-success btn-sm">Перепланировать</button>
-                                <button type="button" class="btn btn-secondary btn-sm">Отменить</button>
+                                            <button type="button" class="btn btn-outline-info ">
+                                                Отменить
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-7 ">
+                                        <table class="table table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Имя</th>
+                                                <th scope="col">E-mail</th>
+                                                <th scope="col">Отмена участия</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <th scope="row">1</th>
+                                                <td>Mark fh dfhg</td>
+                                                <td>Otto</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link">Отменить участие
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">2</th>
+                                                <td>Jacob</td>
+                                                <td>Thornton</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link">Отменить участие
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">3</th>
+                                                <td colspan="2">Larry the Bird</td>
+                                                <td>@twitter</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
                     </div>
-
 
                     <div class="card">
-                        <div class="card-header" id="headingTwo">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
-                                        data-target="#collapseTwo" aria-expanded="false"
-                                        aria-controls="collapseTwo">
-                                    Collapsible Group Item #2
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
-                             data-parent="#accordionExample">
-                            <div class="card-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry
-                                richardson ad
-                                squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck
-                                quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird
-                                on it
-                                squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh
-                                helvetica,
-                                craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan
-                                excepteur
-                                butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic
-                                synth
-                                nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                        <div class="card-header" id="heading3">
+                            <div class="row ">
+                                <div class="col-3">15:00-15:30</div>
+                                <div class="col-3"><strong>Examine CSb</strong></div>
+                                <div class="col-3">Signd 5 of 8</div>
+                                <div class="col">
+                                    <button class="btn btn-link close" type="button" data-toggle="collapse"
+                                            data-target="#collapse3" aria-expanded="false"
+                                            aria-controls="collapse3">
+                                        <h6>Дополнительно</h6>
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+
+                        <div id="collapse3" class="collapse " aria-labelledby="heading3"
+                             data-parent="#accordionVisitorsList">
+                            <div class="container align-items-center">
+                                <div class="row ">
+                                    <div class="col-3 align-self-center">
+                                        <div class="btn-group-vertical">
+                                            <button type="button" class="btn btn-outline-success">
+                                                Перепланировать
+                                            </button>
+
+                                            <button type="button" class="btn btn-outline-info ">
+                                                Отменить
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-7 ">
+                                        <table class="table table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Имя</th>
+                                                <th scope="col">E-mail</th>
+                                                <th scope="col">Отмена участия</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <th scope="row">1</th>
+                                                <td>Mark</td>
+                                                <td>Otto</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link">Отменить участие
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">2</th>
+                                                <td>Jacob</td>
+                                                <td>Thornton</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link">Отменить участие
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">3</th>
+                                                <td colspan="2">Larry the Bird</td>
+                                                <td>@twitter</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
 
-                </div>
+                    <div class="card">
+                        <div class="card-header" id="heading2">
+                            <div class="row ">
+                                <div class="col-3">15:00-15:30</div>
+                                <div class="col-3"><strong>Examine CSb</strong></div>
+                                <div class="col-3">Signd 5 of 8</div>
+                                <div class="col">
+                                    <button class="btn btn-link close" type="button" data-toggle="collapse"
+                                            data-target="#collapse2" aria-expanded="false"
+                                            aria-controls="collapse2">
+                                        <h6>Дополнительно</h6>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div id="collapse2" class="collapse " aria-labelledby="heading2"
+                             data-parent="#accordionVisitorsList">
+                            <div class="container align-items-center">
+                                <div class="row ">
+                                    <div class="col-3 align-self-center">
+                                        <div class="btn-group-vertical">
+                                            <button type="button" class="btn btn-outline-success">
+                                                Перепланировать
+                                            </button>
+
+                                            <button type="button" class="btn btn-outline-info ">
+                                                Отменить
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-7 ">
+                                        <table class="table table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Имя</th>
+                                                <th scope="col">E-mail</th>
+                                                <th scope="col">Отмена участия</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <th scope="row">1</th>
+                                                <td>Mark</td>
+                                                <td>Otto</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link">Отменить участие
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">2</th>
+                                                <td>Jacob</td>
+                                                <td>Thornton</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link">Отменить участие
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">3</th>
+                                                <td colspan="2">Larry the Bird</td>
+                                                <td>@twitter</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- event------------------------------------->
@@ -245,7 +413,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newEvent()">Заплпнировать
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newEvent()">
+                    Заплпнировать
                 </button>
             </div>
         </div>
