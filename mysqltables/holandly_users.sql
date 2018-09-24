@@ -16,32 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `eventsList`
+-- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `eventsList`;
+DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `eventsList` (
+CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` date NOT NULL,
-  `time` time NOT NULL,
-  `patternId` int(11) NOT NULL,
+  `email` varchar(45) NOT NULL,
+  `password` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `id_idx` (`patternId`),
-  CONSTRAINT `id` FOREIGN KEY (`patternId`) REFERENCES `eventPattern` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  UNIQUE KEY `email_UNIQUE` (`email`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `eventsList`
+-- Dumping data for table `users`
 --
 
-LOCK TABLES `eventsList` WRITE;
-/*!40000 ALTER TABLE `eventsList` DISABLE KEYS */;
-INSERT INTO `eventsList` VALUES (1,'2018-11-11','12:30:00',1),(2,'2018-12-12','11:11:00',1),(3,'2018-10-09','12:00:00',2),(5,'2018-09-10','10:00:00',3);
-/*!40000 ALTER TABLE `eventsList` ENABLE KEYS */;
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'andrey@gmail.com','z001');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

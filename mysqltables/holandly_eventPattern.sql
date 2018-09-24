@@ -30,7 +30,7 @@ CREATE TABLE `eventPattern` (
   `description` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `eventPattern` (
 
 LOCK TABLES `eventPattern` WRITE;
 /*!40000 ALTER TABLE `eventPattern` DISABLE KEYS */;
-INSERT INTO `eventPattern` VALUES (1,'some',2,30,'hi'),(2,'exam',1,30,'wtf');
+INSERT INTO `eventPattern` VALUES (1,'test',1,40,'blabla'),(2,'exam',1,30,'wtf'),(3,'hackathon',10,240,'lil hack');
 /*!40000 ALTER TABLE `eventPattern` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-09-19 14:48:11
+-- Dump completed on 2018-09-24 19:10:26

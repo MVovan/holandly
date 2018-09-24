@@ -25,11 +25,14 @@ DROP TABLE IF EXISTS `eventVisitors`;
 CREATE TABLE `eventVisitors` (
   `eventId` int(11) NOT NULL,
   `visitorId` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `visitorId` (`visitorId`),
   KEY `eventVisitors_ibfk_1` (`eventId`),
   CONSTRAINT `eventVisitors_ibfk_1` FOREIGN KEY (`eventId`) REFERENCES `eventsList` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `eventVisitors_ibfk_2` FOREIGN KEY (`visitorId`) REFERENCES `visitors` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,6 +41,7 @@ CREATE TABLE `eventVisitors` (
 
 LOCK TABLES `eventVisitors` WRITE;
 /*!40000 ALTER TABLE `eventVisitors` DISABLE KEYS */;
+INSERT INTO `eventVisitors` VALUES (1,1,1),(5,1,2),(5,2,3),(5,3,4),(2,2,5);
 /*!40000 ALTER TABLE `eventVisitors` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-09-19 14:48:11
+-- Dump completed on 2018-09-24 19:10:26
