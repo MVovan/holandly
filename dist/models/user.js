@@ -33,7 +33,6 @@ exports.validateUser = (req, res) => {
     });
 };
 exports.sendScheduledEvents = (req, res) => {
-    let scheduledEvents = [];
     exports.dbConnect.query(`select visitors.name, visitors.email, eventsList.date, eventsList.time, eventPattern.type, eventPattern.number,
                 eventPattern.duration, eventPattern.description, visitCount.occupied from holandly.eventVisitors
                 inner join visitors on eventVisitors.visitorId = visitors.id
@@ -44,32 +43,62 @@ exports.sendScheduledEvents = (req, res) => {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
-        else {
+        else if (results.length > 0) {
+            let scheduledEvents = [];
+            let prevDate;
+            let prevTime;
             results.forEach(function (entry) {
-                let event = {};
-                event.name = entry.name;
-                event.email = entry.email;
-                event.date = entry.date;
-                event.time = entry.time;
-                event.type = entry.type;
-                event.number = entry.number;
-                event.duration = entry.duration;
-                event.description = entry.description;
-                event.occupied = entry.occupied;
-                scheduledEvents.push(event);
+                if (entry.date === prevDate) {
+                    if (entry.time === prevTime) {
+                        scheduledEvents[scheduledEvents.length - 1]
+                            .appointments[scheduledEvents[scheduledEvents.length - 1].appointments.length - 1]
+                            .visitors.push(makeVisitorObject(entry));
+                    }
+                    else {
+                        prevTime = entry.time;
+                        scheduledEvents[scheduledEvents.length - 1].push({
+                            time: prevTime,
+                            visitors: [makeVisitorObject(entry)]
+                        });
+                    }
+                }
+                else {
+                    let event = {};
+                    prevDate = event.date = entry.date;
+                    prevTime = entry.time;
+                    event.appointments = [{
+                            time: prevTime,
+                            visitors: [makeVisitorObject(entry)]
+                        }];
+                    scheduledEvents.push(event);
+                }
             });
+            console.log(scheduledEvents);
             res.send(JSON.stringify(scheduledEvents));
+        }
+        else {
+            res.send("No scheduled events");
         }
     });
 };
+let makeVisitorObject = (entry) => {
+    return {
+        type: entry.type,
+        name: entry.name,
+        email: entry.email,
+        duration: entry.duration,
+        description: entry.description,
+        number: entry.number,
+        occupied: entry.occupied
+    };
+};
 exports.sendEventPatterns = (req, res) => {
-    console.log("eventPatterns sent");
     let respObjects = [];
     exports.dbConnect.query(`select * from eventPattern;`, function (err, results, fields) {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
-        else {
+        else if (results.length > 0) {
             results.forEach(function (entry) {
                 let eventObject = {};
                 eventObject.id = entry.id;
@@ -80,6 +109,9 @@ exports.sendEventPatterns = (req, res) => {
                 respObjects.push(eventObject);
             });
             res.end(JSON.stringify(respObjects));
+        }
+        else {
+            res.end("No patterns yet");
         }
     });
 };
@@ -92,13 +124,12 @@ exports.sendAvailableEvents = (req, res) => {
         if (err) {
             res.sendStatus(404).send("Data retrieval failed");
         }
-        else {
+        else if (results.length > 0) {
             results.forEach(function (entry) {
                 let eventObject = {};
                 eventObject.id = entry.id;
                 eventObject.time = entry.time;
                 eventObject.type = entry.type;
-                console.log(entry.date);
                 eventObject.date = entry.date;
                 eventObject.patternId = entry.patternId;
                 eventObject.occupied = entry.occupied;
@@ -106,6 +137,9 @@ exports.sendAvailableEvents = (req, res) => {
                 respObjects.push(eventObject);
             });
             res.end(JSON.stringify(respObjects));
+        }
+        else {
+            res.end("No events to show");
         }
     });
 };
@@ -117,7 +151,7 @@ exports.addNewEventPattern = (req, res) => {
             res.sendStatus(404).send("Data retrieval failed");
         }
         else {
-            res.end("Successfull");
+            res.end("Successful");
         }
     });
 };
@@ -129,7 +163,7 @@ exports.deleteEventPattern = (req, res) => {
             res.sendStatus(404).send("Data retrieval failed");
         }
         else {
-            res.end("Successfull");
+            res.end("Successful");
         }
     });
 };
@@ -141,7 +175,7 @@ exports.deleteEvent = (req, res) => {
             res.sendStatus(404).send("Data retrieval failed");
         }
         else {
-            res.end("Successfull");
+            res.end("Successful");
         }
     });
 };
@@ -154,7 +188,7 @@ exports.addEvent = (req, res) => {
             res.sendStatus(404).send("Data retrieval failed");
         }
         else {
-            res.end("Successfull");
+            res.end("Successful");
         }
     });
 };

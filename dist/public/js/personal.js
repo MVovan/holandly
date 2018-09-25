@@ -78,101 +78,126 @@ function getVisitors() {
     });
 }
 
+function createDateCard(data) {
+    let visitorsField = document.getElementById('div-dashboard');
+    visitorsField.innerHTML = '';
+    for (let d = 0; d < data.length; d++) {
+        let DayEvents = document.createElement('div');
+        DayEvents.id = 'dateEvent' + data[d].date;
+        DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
+        DayEvents.innerHTML = '<strong>' + data[d].date + '</strong><hr>';
+        let visitorsListColapse = document.createElement('div');
+        visitorsListColapse.classList.add("accordion");
+        visitorsListColapse.id = 'accordionVisitorsList' + DayEvents.id;
+        DayEvents.appendChild(visitorsListColapse);
+        visitorsField.appendChild(DayEvents);
+    }
+}
+
+function createtimeCard(data) {
+//     for (let d = 0; d < data.length; d++) {
+//     let timeEvents = data[d].time;
+//         for (let t = 0; t < timeEvents.length; t++) {
+//             let TimeEvent = document.createElement('div');
+//             TimeEvent.classList.add("accordion");
+//             TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
+//             TimeEvent.innerHTML +=
+//                 '<div class="card">' +
+//                 '<div class="card-header" id="heading' + eventAmount + '">' +
+//                 '<div class="row ">' +
+//                 '<div class="col-3">' +
+//                 timeEvents[t].time +
+//                 '</div><div class="col-3"><strong>' +
+//                 'Examine CSb' +
+//                 '</strong></div><div class="col-3">' +
+//                 'Signd 5 of 8' +
+//                 '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
+//                 'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
+//
+}
+
 function makeVisitorsList(data) {
+    //createDateCard(data);
     let visitorsField = document.getElementById('div-dashboard');
     visitorsField.innerHTML = '';
     let eventAmount = 0;
-    for (let i = 0; i < data.length; i++) {
 
-        let DayEvents = $('#dateEvent' + data[i].date);
-        if (DayEvents.length === 0) {
+    for (let d = 0; d < data.length; d++) {
+        let DayEvents = document.createElement('div');
+        DayEvents.id = 'dateEvent' + data[d].date;
+        DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
+        DayEvents.innerHTML = '<strong>' + data[d].date + '</strong><hr>';
+        let visitorsListColapse = document.createElement('div');
+        visitorsListColapse.classList.add("accordion");
+        visitorsListColapse.id = 'accordionVisitorsList' + DayEvents.id;
+        visitorsField.appendChild(DayEvents);
 
-            DayEvents = document.createElement('div');
-            DayEvents.id = 'dateEvent' + data[i].date;
-            DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-            DayEvents.innerHTML =
-                '<strong>' + data[i].date + '</strong><hr>';
-            visitorsField.appendChild(DayEvents);
+        let timeEvents = data[d].time;
+        for (let t = 0; t < timeEvents.length; t++) {
+            let TimeEvent = document.createElement('div');
+            TimeEvent.classList.add("accordion");
+            TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
+            TimeEvent.innerHTML +=
+                '<div class="card">' +
+                '<div class="card-header" id="heading' + eventAmount + '">' +
+                '<div class="row ">' +
+                '<div class="col-3">' +
+                timeEvents[t].time +
+                '</div><div class="col-3"><strong>' +
+                'Examine CSb' +
+                '</strong></div><div class="col-3">' +
+                'Signd 5 of 8' +
+                '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
+                'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
+
+            TimeEvent.innerHTML +=
+                '<div id="collapse' + eventAmount + '" class="collapse " aria-labelledby="heading' + eventAmount + '"' +
+                'data-parent="#' + TimeEvent.id + '">' +
+                '<div class="container align-items-center">' +
+                '<div class="row ">' +
+                '<div class="col-3 align-self-center">' +
+                '<div class="btn-group-vertical">' +
+                '<button type="button" class="btn btn-outline-success">' +
+                'Перепланировать' +
+                '</button>' +
+                '<button type="button" class="btn btn-outline-info ">' +
+                'Отменить' +
+                '</button>' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-7 " id="visitorsTable' + eventAmount + '">';
+            let tableVisitor = document.createElement('table');
+            tableVisitor.classList.add('table', 'table-sm')
+            tableVisitor.innerHTML =
+                '<thead><tr><td>#</td>' +
+                '<td>Имя</td>' +
+                '<td>E-mail</td>' +
+                '<td>Отмена участия</td>' +
+                '</tr></thead><tbody>';
+
+            let visitorsEvents = timeEvents[t].visitors;
+            for (let v = 0; v < visitorsEvents.length; v++) {
+                tableVisitor.innerHTML +=
+                    '<tr>' +
+                    '<th scope="row">' + v + '</th>' +
+                    '<td>' + visitorsEvents[v].name + '</td>' +
+                    '<td>' + visitorsEvents[v].email + '</td>' +
+                    '<td><button type="button" class="btn btn-link">Отменить участие</button></td>' +
+                    '</tr>';
+            }
+            tableVisitor.innerHTML +=
+                '</tbody>' +
+                '</table>';
+            visitorsListColapse.appendChild(TimeEvent);
+            DayEvents.appendChild(visitorsListColapse);
+            let id = 'visitorsTable' + eventAmount;
+            let element = document.getElementById(id);
+            element.appendChild(tableVisitor);
+            eventAmount++;
         }
-        else
-            DayEvents = DayEvents[0];
-
-        let TimeEvent = document.createElement('div');
-        TimeEvent.classList.add("accordion");
-        TimeEvent.id = 'idDayVisitorsList' + data[i].date;
-        TimeEvent.innerHTML +=
-            '<div class="card">' +
-            '<div class="card-header" id="headingOne">' +
-            '<div class="row ">' +
-            '<div class="col-3">' +
-            data[i].time + '/' + data[i].duration +
-            '</div>' +
-            '<div class="col-3"><strong>' +
-            data[i].type +
-            '</strong></div>' +
-            '<div class="col-3">' +
-            data[i].number +
-            '</div>' +
-            '<div class="col text-right">' +
-            '<a href="#" data-toggle="collapse"' +
-            'data-target="#collapseOne" aria-expanded="false"' +
-            'aria-controls="collapseOne">Дополнительно</a>' +
-            '</div>' +
-            '</div>' +
-            '</div>';
-        TimeEvent.innerHTML += '<div id="collapseOne" class="collapse " aria-labelledby="headingOne"' +
-            '                             data-parent="#accordionVisitorsList">' +
-            '                            <div class="container align-items-center">' +
-            '                                <div class="row ">' +
-            '                                    <div class="col-3 align-self-center">' +
-            '                                        <div class="btn-group-vertical">' +
-            '                                            <button type="button" class="btn btn-outline-success">' +
-            '                                                Перепланировать' +
-            '                                            </button>' +
-            '                                            <button type="button" class="btn btn-outline-info ">' +
-            '                                                Отменить' +
-            '                                            </button>' +
-            '                                        </div>' +
-            '                                    </div>' +
-            '                                    <div class="col-7 ">' +
-            '                                        <table class="table table-sm">' +
-            '                                            <thead>' +
-            '                                            <tr>' +
-            '                                                <th scope="col">#</th>' +
-            '                                                <th scope="col">Имя</th>' +
-            '                                                <th scope="col">E-mail</th>' +
-            '                                                <th scope="col">Отмена участия</th>' +
-            '                                            </tr>' +
-            '                                            </thead>' +
-            '                                            <tbody>' +
-            '                                            <tr>' +
-            '                                                <th scope="row">1</th>' +
-            '                                                <td>Mark fh dfhg</td>' +
-            '                                                <td>Otto</td>' +
-            '                                                <td>' +
-            '                                                    <button type="button" class="btn btn-link">Отменить участие\n' +
-            '                                                    </button>' +
-            '                                                </td>' +
-            '                                            </tr>' +
-            '                                            <tr>' +
-            '                                                <th scope="row">2</th>' +
-            '                                                <td>Jacob</td>' +
-            '                                                <td>Thornton</td>' +
-            '                                                <td>' +
-            '                                                    <button type="button" class="btn btn-link">Отменить участие\n' +
-            '                                                    </button>' +
-            '                                                </td>' +
-            '                                            </tr>' +
-            '                                            </tbody>' +
-            '                                        </table>' +
-            '                                    </div>' +
-            '                                </div>' +
-            '                            </div>' +
-            '                        </div>';
-        DayEvents.appendChild(TimeEvent);
     }
     if (data.length > 0)
-        document.getElementById('visitor-amount').innerText = data.length;
+        document.getElementById('visitor-amount').innerText = eventAmount;
     $("#div-event .updateEvent").click(
         function () {
             console.log(this.parentNode.parentNode.data);
@@ -193,17 +218,6 @@ function makeVisitorsList(data) {
         }
     );
 }
-
-function elementDayEvent(dayData) {
-    let DayEvents = document.createElement('div');
-    DayEvents.id = 'dateEvent' + dayData.date;
-    DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-    DayEvents.innerHTML =
-        '<strong>' + dayData.date + '</strong><hr>';
-
-    return DayEvents;
-}
-
 
 function getEvents() {
     $.ajax({
@@ -239,7 +253,7 @@ function makeEventsPoint(data) {
             let type = $('#pattern' + data[i].patternId);
             PatternEvent.innerHTML =
                 ' <div className="alert alert-success text-left" role="alert">' +
-                '<strong>' + data[i].type + '</strong><hr>';
+                '<strong>' + type[0].data.patternType + '</strong><hr>';
             eventField.appendChild(PatternEvent);
             eventAmount++;
         }
@@ -258,7 +272,7 @@ function makeEventsPoint(data) {
         eventCard.innerHTML +=
             '<button id="btnGroupDrop2" type="button" class="btn btn-outline-dark dropdown-toggle"' +
             '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-            moment(data[i].date).format('DD MM YYYY') + '<br/>' +
+            data[i].date + '<br/>' +
             data[i].time + '<br/>' +
             'Своб.8/6' +
             '</button>';
@@ -350,7 +364,7 @@ function newEvent() {
 function getPatterns() {
     $.ajax({
         type: 'get',
-        url: '/data',
+        url: '/pattern',
         // url: 'http://andrey.4.holateam.io:8130/data',
         dataType: 'json',
         username: 'ub',

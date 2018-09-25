@@ -32,7 +32,7 @@ export const dbConnect = mysql.createConnection({
   }
 
   export let sendScheduledEvents = (req: Request, res: Response) => {
-    let scheduledEvents: any[] = [];
+    
     dbConnect.query(`select visitors.name, visitors.email, eventsList.date, eventsList.time, eventPattern.type, eventPattern.number,
                 eventPattern.duration, eventPattern.description, visitCount.occupied from holandly.eventVisitors
                 inner join visitors on eventVisitors.visitorId = visitors.id
@@ -44,24 +44,53 @@ export const dbConnect = mysql.createConnection({
       if(err) {
           res.sendStatus(404).send("Data retrieval failed");
       } else if(results.length > 0) {
+        let scheduledEvents: any[] = [];
+        let prevDate: any;
+        let prevTime: any;
         results.forEach(function(entry: any) {
+          
+          if(entry.date === prevDate) {
+            if(entry.time === prevTime) {
+              scheduledEvents[scheduledEvents.length - 1]
+              .appointments[scheduledEvents[scheduledEvents.length - 1].appointments.length - 1]
+              .visitors.push(makeVisitorObject(entry));
+            } else {
+              prevTime = entry.time;
+              scheduledEvents[scheduledEvents.length - 1].push({
+                time: prevTime,
+                visitors: [makeVisitorObject(entry)]
+              })
+            }
+          } else {
             let event: any = {};
-            event.name = entry.name;
-            event.email = entry.email;
-            event.date = entry.date;
-            event.time = entry.time;
-            event.type = entry.type;
-            event.number = entry.number;
-            event.duration = entry.duration;
-            event.description = entry.description;
-            event.occupied = entry.occupied;
+            prevDate = event.date = entry.date;
+            prevTime = entry.time;
+            event.appointments = [{
+              time: prevTime,
+              visitors: [makeVisitorObject(entry)]
+            }];
             scheduledEvents.push(event);
-          })
-          res.send(JSON.stringify(scheduledEvents));
+          }
+            
+        })
+        console.log(scheduledEvents);
+        res.send(JSON.stringify(scheduledEvents));
       } else {
         res.send("No scheduled events")
       } 
     })
+  }
+
+  let makeVisitorObject = (entry: any): any => {
+    return {
+      type: entry.type,
+      name: entry.name,
+      email: entry.email,
+      duration: entry.duration,
+      description: entry.description,
+      number: entry.number,
+      occupied: entry.occupied
+    }
   }
 
 export let sendEventPatterns = (req: Request, res: Response) => {
