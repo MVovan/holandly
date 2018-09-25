@@ -45,7 +45,7 @@ app.get('/logout', userController.stopSession);
 app.get('/scheduled', userModel.sendScheduledEvents);
 
 /* Returns all the existing event patterns */
-app.get('/data', userModel.sendEventPatterns)
+app.get('/pattern', userModel.sendEventPatterns)
 
 //sort by id and data time
 app.get('/events', userModel.sendAvailableEvents)
@@ -59,7 +59,7 @@ app.delete('/pattern/*', userModel.deleteEventPattern)
 
 app.delete('/event/*', userModel.deleteEvent)
 
-app.post('/event', userModel.addEvent)
+app.post('/events', userModel.addEvent)
 
 app.listen(8130, () => {
     console.log('wat up');

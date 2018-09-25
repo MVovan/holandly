@@ -40,7 +40,7 @@ app.get('/logout', userController.stopSession);
 /*Returns all the scheduled events info */
 app.get('/scheduled', userModel.sendScheduledEvents);
 /* Returns all the existing event patterns */
-app.get('/data', userModel.sendEventPatterns);
+app.get('/pattern', userModel.sendEventPatterns);
 //sort by id and data time
 app.get('/events', userModel.sendAvailableEvents);
 /* adds new pattern */
@@ -48,7 +48,7 @@ app.post('/pattern', userModel.addNewEventPattern);
 /* deletes the pattern by id specified in params, and then deletes all the events  */
 app.delete('/pattern/*', userModel.deleteEventPattern);
 app.delete('/event/*', userModel.deleteEvent);
-app.post('/event', userModel.addEvent);
+app.post('/events', userModel.addEvent);
 app.listen(8130, () => {
     console.log('wat up');
 });

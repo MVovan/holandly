@@ -23,11 +23,11 @@ exports.validateUser = (req, res) => {
                     return res.redirect('../../');
                 }
                 else {
-                    res.sendStatus(403).send("Incorrect password");
+                    res.send("Incorrect password");
                 }
             }
             else {
-                res.sendStatus(403).send("User not found");
+                res.send("User not found");
             }
         }
     });
@@ -39,25 +39,32 @@ exports.sendScheduledEvents = (req, res) => {
                 inner join eventsList on eventVisitors.eventId = eventsList.id
                 inner join eventPattern on eventsList.patternId = eventPattern.id
                 left join (select eventId, COUNT(*) AS occupied from eventVisitors group by eventId) AS visitCount on eventsList.id = visitCount.eventId
-                order by eventsList.date, eventsList.time;`, function (err, results, fields) {
+                order by eventsList.date, eventsList.time, eventPattern.type;`, function (err, results, fields) {
         if (err) {
-            res.sendStatus(404).send("Data retrieval failed");
+            res.send("Data retrieval failed");
         }
         else if (results.length > 0) {
             let scheduledEvents = [];
             let prevDate;
             let prevTime;
+            let prevType;
             results.forEach(function (entry) {
                 if (entry.date === prevDate) {
-                    if (entry.time === prevTime) {
+                    if (entry.time === prevTime && entry.type === prevType) {
                         scheduledEvents[scheduledEvents.length - 1]
                             .appointments[scheduledEvents[scheduledEvents.length - 1].appointments.length - 1]
                             .visitors.push(makeVisitorObject(entry));
                     }
                     else {
                         prevTime = entry.time;
+                        prevType = entry.type;
                         scheduledEvents[scheduledEvents.length - 1].push({
                             time: prevTime,
+                            type: prevType,
+                            duration: entry.duration,
+                            description: entry.description,
+                            number: entry.number,
+                            occupied: entry.occupied,
                             visitors: [makeVisitorObject(entry)]
                         });
                     }
@@ -66,8 +73,14 @@ exports.sendScheduledEvents = (req, res) => {
                     let event = {};
                     prevDate = event.date = entry.date;
                     prevTime = entry.time;
+                    prevType = entry.type;
                     event.appointments = [{
                             time: prevTime,
+                            type: prevType,
+                            duration: entry.duration,
+                            description: entry.description,
+                            number: entry.number,
+                            occupied: entry.occupied,
                             visitors: [makeVisitorObject(entry)]
                         }];
                     scheduledEvents.push(event);
@@ -77,19 +90,14 @@ exports.sendScheduledEvents = (req, res) => {
             res.send(JSON.stringify(scheduledEvents));
         }
         else {
-            res.send("No scheduled events");
+            res.json("No scheduled events");
         }
     });
 };
 let makeVisitorObject = (entry) => {
     return {
-        type: entry.type,
         name: entry.name,
         email: entry.email,
-        duration: entry.duration,
-        description: entry.description,
-        number: entry.number,
-        occupied: entry.occupied
     };
 };
 exports.sendEventPatterns = (req, res) => {
@@ -111,7 +119,7 @@ exports.sendEventPatterns = (req, res) => {
             res.end(JSON.stringify(respObjects));
         }
         else {
-            res.end("No patterns yet");
+            res.json("No patterns yet");
         }
     });
 };
@@ -139,7 +147,7 @@ exports.sendAvailableEvents = (req, res) => {
             res.end(JSON.stringify(respObjects));
         }
         else {
-            res.end("No events to show");
+            res.json("No events to show");
         }
     });
 };
@@ -151,7 +159,7 @@ exports.addNewEventPattern = (req, res) => {
             res.sendStatus(404).send("Data retrieval failed");
         }
         else {
-            res.end("Successful");
+            res.json("Successful");
         }
     });
 };
@@ -160,10 +168,10 @@ exports.deleteEventPattern = (req, res) => {
     console.log(patternId);
     exports.dbConnect.query(`delete from eventPattern where eventPattern.id = ?`, patternId, function (err, results, fields) {
         if (err) {
-            res.sendStatus(404).send("Data retrieval failed");
+            res.send("Data retrieval failed");
         }
         else {
-            res.end("Successful");
+            res.send("Successful");
         }
     });
 };
@@ -172,23 +180,23 @@ exports.deleteEvent = (req, res) => {
     console.log(eventId);
     exports.dbConnect.query(`delete from eventsList where eventsList.id = ?`, eventId, function (err, results, fields) {
         if (err) {
-            res.sendStatus(404).send("Data retrieval failed");
+            res.send("Data retrieval failed");
         }
         else {
-            res.end("Successful");
+            res.json("Successful");
         }
     });
 };
 exports.addEvent = (req, res) => {
     let event = req.body;
     console.log(req.body);
-    console.log(event.time + "" + event.date);
-    exports.dbConnect.query(`insert into eventsList SET ? ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`, [event, event.time, event.date, event.patternId], function (err, results, fields) {
+    console.log(event[0].time + "" + event[0].date);
+    exports.dbConnect.query(`insert into eventsList SET ? ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`, [event[0], event[0].time, event[0].date, event[0].patternId], function (err, results, fields) {
         if (err) {
-            res.sendStatus(404).send("Data retrieval failed");
+            res.send("Data retrieval failed");
         }
         else {
-            res.end("Successful");
+            res.json("Successful");
         }
     });
 };

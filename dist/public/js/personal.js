@@ -253,7 +253,7 @@ function makeEventsPoint(data) {
             let type = $('#pattern' + data[i].patternId);
             PatternEvent.innerHTML =
                 ' <div className="alert alert-success text-left" role="alert">' +
-                '<strong>' + type[0].data.patternType + '</strong><hr>';
+                '<strong>' + data[i].patternType + '</strong><hr>';
             eventField.appendChild(PatternEvent);
             eventAmount++;
         }
@@ -399,7 +399,7 @@ function makePatternCard(data) {
             '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
             '<a class="dropdown-item delPater" href="#">Удалить</a>' +
             '</div>' +
-            '<span class="badge badge-warning">' + patternCard.data.patternID + '</span></a>' +
+            '<span class="badge badge-warning">' + patternCard.data[i].patternID + '</span></a>' +
             '</div>' +
             '<div class = "card-body text-primary">' +
             '<p class="card-text">' + pattenn.description + '</p>' +
