@@ -1,58 +1,54 @@
-$(function () {
-    $('[data-toggle="popover"]').popover()
-});
-
-$(function () {
-    $('.example-popover').popover({
-        container: 'body'
-    })
-});
-
-$('.popover-dismiss').popover({
-    trigger: 'focus'
-});
-
-$.ajaxSetup({
-    headers: {
-        'Authorization': "Basic " + btoa('user' + ':' + 'passw')
-    }
-});
-
-$("li").hover(
-    function () {
-        $(this).css({
-            fontWeight: "bolder"
-        });
-        $(this).click(function (eventObject) {
-            console.log(eventObject);
-            //TabsSelect();
-            console.log(this.data - value);
-            removeTask(this.parentNode.data.index);
-        });
-    },
-    function () {
-        var cssObj = {
-            fontWeight: "normal",
-        };
-        $(this).css(cssObj);
-    }
-);
-
 window.onload = function () {
     console.log('------------------>');
     $(function () {
         $('[data-toggle="popover"]').popover()
-    })
+    });
 
     $(function () {
         $('.example-popover').popover({
             container: 'body'
         })
-    })
+    });
 
     $('.popover-dismiss').popover({
         trigger: 'focus'
-    })
+    });
+
+    $("li").hover(
+        function () {
+            $(this).css({
+                fontWeight: "bolder"
+            });
+            $(this).click(function (eventObject) {
+                // console.log(eventObject);
+            });
+        },
+        function () {
+            var cssObj = {
+                fontWeight: "normal",
+            };
+            $(this).css(cssObj);
+        }
+    );
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    });
+
+    $(function () {
+        $('.example-popover').popover({
+            container: 'body'
+        })
+    });
+
+    $('.popover-dismiss').popover({
+        trigger: 'focus'
+    });
+
+    $.ajaxSetup({
+        headers: {
+            'Authorization': "Basic " + btoa('user' + ':' + 'passw')
+        }
+    });
     getPatterns();
     getEvents();
     getVisitors();
@@ -78,44 +74,6 @@ function getVisitors() {
     });
 }
 
-function createDateCard(data) {
-    let visitorsField = document.getElementById('div-dashboard');
-    visitorsField.innerHTML = '';
-    for (let d = 0; d < data.length; d++) {
-        let DayEvents = document.createElement('div');
-        DayEvents.id = 'dateEvent' + data[d].date;
-        DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-        DayEvents.innerHTML = '<strong>' + data[d].date + '</strong><hr>';
-        let visitorsListColapse = document.createElement('div');
-        visitorsListColapse.classList.add("accordion");
-        visitorsListColapse.id = 'accordionVisitorsList' + DayEvents.id;
-        DayEvents.appendChild(visitorsListColapse);
-        visitorsField.appendChild(DayEvents);
-    }
-}
-
-function createtimeCard(data) {
-//     for (let d = 0; d < data.length; d++) {
-//     let timeEvents = data[d].time;
-//         for (let t = 0; t < timeEvents.length; t++) {
-//             let TimeEvent = document.createElement('div');
-//             TimeEvent.classList.add("accordion");
-//             TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
-//             TimeEvent.innerHTML +=
-//                 '<div class="card">' +
-//                 '<div class="card-header" id="heading' + eventAmount + '">' +
-//                 '<div class="row ">' +
-//                 '<div class="col-3">' +
-//                 timeEvents[t].time +
-//                 '</div><div class="col-3"><strong>' +
-//                 'Examine CSb' +
-//                 '</strong></div><div class="col-3">' +
-//                 'Signd 5 of 8' +
-//                 '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
-//                 'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
-//
-}
-
 function makeVisitorsList(data) {
     //createDateCard(data);
     let visitorsField = document.getElementById('div-dashboard');
@@ -124,29 +82,37 @@ function makeVisitorsList(data) {
 
     for (let d = 0; d < data.length; d++) {
         let DayEvents = document.createElement('div');
-        DayEvents.id = 'dateEvent' + data[d].date;
+        DayEvents.id = 'dateEvent' + d;
         DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-        DayEvents.innerHTML = '<strong>' + data[d].date + '</strong><hr>';
+        DayEvents.innerHTML = '<strong>' + moment(data[d].date).format('DD/MM/YYYY') + '</strong><hr>';
         let visitorsListColapse = document.createElement('div');
         visitorsListColapse.classList.add("accordion");
         visitorsListColapse.id = 'accordionVisitorsList' + DayEvents.id;
         visitorsField.appendChild(DayEvents);
 
-        let timeEvents = data[d].time;
+        let timeEvents = data[d].appointments;
         for (let t = 0; t < timeEvents.length; t++) {
             let TimeEvent = document.createElement('div');
             TimeEvent.classList.add("accordion");
             TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
+            TimeEvent.data = {
+                'date':data[d].date,
+                'time':timeEvents[t].time,
+                'eventId':DayEvents.id,
+            };
+            let timeEnd = moment(timeEvents[t].time, 'hh:mm:ss');
+            timeEnd.add(timeEvents[t].duration, 'minutes');
             TimeEvent.innerHTML +=
                 '<div class="card">' +
                 '<div class="card-header" id="heading' + eventAmount + '">' +
                 '<div class="row ">' +
                 '<div class="col-3">' +
-                timeEvents[t].time +
+                moment(timeEvents[t].time, 'hh:mm:ss').format("HH:mm") + '-' +
+                moment(timeEnd, 'mm').format("HH:mm") +
                 '</div><div class="col-3"><strong>' +
-                'Examine CSb' +
+                timeEvents[t].type +
                 '</strong></div><div class="col-3">' +
-                'Signd 5 of 8' +
+                'Усасников ' + timeEvents[t].occupied + ' из ' + timeEvents[t].number +
                 '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
                 'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
 
@@ -157,10 +123,10 @@ function makeVisitorsList(data) {
                 '<div class="row ">' +
                 '<div class="col-3 align-self-center">' +
                 '<div class="btn-group-vertical">' +
-                '<button type="button" class="btn btn-outline-success">' +
+                '<button type="button" class="btn btn-outline-success rescheduleVisitor">' +
                 'Перепланировать' +
                 '</button>' +
-                '<button type="button" class="btn btn-outline-info ">' +
+                '<button type="button" class="btn btn-outline-info removeVisitor">' +
                 'Отменить' +
                 '</button>' +
                 '</div>' +
@@ -198,20 +164,20 @@ function makeVisitorsList(data) {
     }
     if (data.length > 0)
         document.getElementById('visitor-amount').innerText = eventAmount;
-    $("#div-event .updateEvent").click(
+    $("#div-dashboard .rescheduleVisitor").click(
         function () {
             console.log(this.parentNode.parentNode.data);
             //updateEvent(this.parentNode.parentNode.data);
-
-            $("#modalPatternId").val(this.parentNode.parentNode.data.patternId);
-            $("#modalEventId").val(this.parentNode.parentNode.data.eventId);
-            $("input#inputDate").val(this.parentNode.parentNode.data.eventDate);
-            $("#inputTime").val(this.parentNode.parentNode.data.eventTime);
+            let data = this.parentNode.parentNode.data;
+            $("#modalPatternId").val(data.patternId);
+            $("#modalEventId").val(data.eventId);
+            $("input#inputDate").val(data.eventDate);
+            $("#inputTime").val(data.eventTime);
 
         }
     );
 
-    $("#div-event .delEvent").click(
+    $("#div-dashboard .removeVisitor").click(
         function () {
             console.log(this.parentNode.parentNode.data.eventId);
             deleteEvent(this.parentNode.parentNode.data.eventId);
@@ -233,6 +199,7 @@ function getEvents() {
             xhr.setRequestHeader('Authorization', "Basic " + btoa('user' + ':' + 'passw'))
         },
         success: function (data) {
+            console.log('event');
             console.log(data);
             makeEventsPoint(data);
         }
@@ -253,7 +220,7 @@ function makeEventsPoint(data) {
             let type = $('#pattern' + data[i].patternId);
             PatternEvent.innerHTML =
                 ' <div className="alert alert-success text-left" role="alert">' +
-                '<strong>' + data[i].patternType + '</strong><hr>';
+                '<strong>' + data[i].patternId + '</strong><hr>';
             eventField.appendChild(PatternEvent);
             eventAmount++;
         }
@@ -269,12 +236,13 @@ function makeEventsPoint(data) {
             eventTime: data[i].time,
             eventDate: data[i].date
         };
+
         eventCard.innerHTML +=
             '<button id="btnGroupDrop2" type="button" class="btn btn-outline-dark dropdown-toggle"' +
             '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-            data[i].date + '<br/>' +
-            data[i].time + '<br/>' +
-            'Своб.8/6' +
+            moment(data[i].date).format('DD/MM/YY') + '<br/>' +
+            moment(data[i].time, 'hh:mm:ss').format("HH:mm") + '<br/>' +
+            'Своб.' + data[i].occupied + '/' + data[i].number +
             '</button>';
         eventCard.innerHTML +=
             '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
@@ -289,19 +257,20 @@ function makeEventsPoint(data) {
         function () {
             console.log(this.parentNode.parentNode.data);
             //updateEvent(this.parentNode.parentNode.data);
-
-            $("#modalPatternId").val(this.parentNode.parentNode.data.patternId);
-            $("#modalEventId").val(this.parentNode.parentNode.data.eventId);
-            $("input#inputDate").val(this.parentNode.parentNode.data.eventDate);
-            $("#inputTime").val(this.parentNode.parentNode.data.eventTime);
+            let data = this.parentNode.parentNode.data;
+            $("#modalPatternId").val(data.patternId);
+            $("#modalEventId").val(data.eventId);
+            $("input#inputDate").val(moment(data.eventDate).format('YYYY-MM-DD'));
+            $("#inputTime").val(data.eventTime);
 
         }
     );
 
     $("#div-event .delEvent").click(
         function () {
-            console.log(this.parentNode.parentNode.data.eventId);
-            deleteEvent(this.parentNode.parentNode.data.eventId);
+            let data = this.parentNode.parentNode.data;
+            console.log(data.eventId);
+            deleteEvent(data.eventId);
         }
     );
 }
@@ -346,13 +315,14 @@ function deleteEvent(id) {
 
 function newEvent() {
     let event = {
-        "patternID": 0,
+        "patternId": 0,
         "time": 0,
         "date": 0,
-        "id": 0
+        "id": null
     };
-    event.id = $("#modalEventId").val();
-    event.patternID = $("#modalPatternId").val();
+    let id = $("#modalEventId").val();
+    if (id !== 0) event.id = id;
+    event.patternId = $("#modalPatternId").val();
     event.date = $("input#inputDate").val();
     event.time = $("#inputTime").val();
     var events = [];
@@ -365,13 +335,13 @@ function getPatterns() {
     $.ajax({
         type: 'get',
         url: '/pattern',
-        // url: 'http://andrey.4.holateam.io:8130/data',
         dataType: 'json',
-        username: 'ub',
-        password: 'ps',
+        // username: 'ub',
+        // password: 'ps',
         data: {},
         response: 'json',
         success: function (data) {
+            console.log('pattern');
             console.log(data);
             makePatternCard(data);
         }
@@ -399,7 +369,7 @@ function makePatternCard(data) {
             '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
             '<a class="dropdown-item delPater" href="#">Удалить</a>' +
             '</div>' +
-            '<span class="badge badge-warning">' + patternCard.data[i].patternID + '</span></a>' +
+            '<span class="badge badge-warning">' + patternCard.data.patternID + '</span></a>' +
             '</div>' +
             '<div class = "card-body text-primary">' +
             '<p class="card-text">' + pattenn.description + '</p>' +
@@ -466,6 +436,7 @@ function deletePattern(id) {
         success: function (data) {
             console.log(data);
             getPatterns();
+            getEvents();
         }
     });
 }

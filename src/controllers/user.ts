@@ -8,7 +8,6 @@ export let requireLogin = (req: Request, res: Response) => {
       res.redirect('/login');
       console.log("redsir");
     } else {
-        console.log(path.join(__dirname, '../public/personal.html'));
         res.sendFile(path.join(__dirname, '../public/personal.html'));
     }
 }

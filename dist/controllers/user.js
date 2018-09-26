@@ -11,7 +11,6 @@ exports.requireLogin = (req, res) => {
         console.log("redsir");
     }
     else {
-        console.log(path_1.default.join(__dirname, '../public/personal.html'));
         res.sendFile(path_1.default.join(__dirname, '../public/personal.html'));
     }
 };

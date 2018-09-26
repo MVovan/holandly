@@ -1,5 +1,5 @@
 import mysql, { MysqlError } from 'mysql';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response} from 'express';
 import path from 'path';
 
 export const dbConnect = mysql.createConnection({
@@ -15,16 +15,16 @@ export const dbConnect = mysql.createConnection({
       if(err) {
         console.log(err);
       } else {
-        console.log(usr[0].password);
-        if(usr) {
+        //console.log(usr[0].password);
+        if(usr.length > 0) {
           if (req.body.password == usr[0].password) {
             req.session.user = req.body;
-            return res.redirect('../../');
+            res.end();
           } else {
-            res.send("Incorrect password");
+            res.json("Incorrect password");
           }
         } else {
-            res.send("User not found");
+            res.json("User not found");
         }
       }
       
@@ -33,7 +33,7 @@ export const dbConnect = mysql.createConnection({
 
   export let sendScheduledEvents = (req: Request, res: Response) => {
     
-    dbConnect.query(`select visitors.name, visitors.email, eventsList.date, eventsList.time, eventPattern.type, eventPattern.number,
+    dbConnect.query(`select visitors.name, visitors.email, eventsList.date, eventsList.time, eventsList.patternId, eventVisitors.eventId, eventPattern.type, eventPattern.number,
                 eventPattern.duration, eventPattern.description, visitCount.occupied from holandly.eventVisitors
                 inner join visitors on eventVisitors.visitorId = visitors.id
                 inner join eventsList on eventVisitors.eventId = eventsList.id
@@ -42,7 +42,7 @@ export const dbConnect = mysql.createConnection({
                 order by eventsList.date, eventsList.time, eventPattern.type;`
     , function(err: MysqlError, results: any, fields: any) {
       if(err) {
-          res.send("Data retrieval failed");
+          res.json("Data retrieval failed");
       } else if(results.length > 0) {
         let scheduledEvents: any[] = [];
         let prevDate: any;
@@ -50,7 +50,7 @@ export const dbConnect = mysql.createConnection({
         let prevType: any;
         results.forEach(function(entry: any) {
           
-          if(entry.date === prevDate) {
+          if(+entry.date === +prevDate) {
             if(entry.time === prevTime && entry.type === prevType) {
               scheduledEvents[scheduledEvents.length - 1]
               .appointments[scheduledEvents[scheduledEvents.length - 1].appointments.length - 1]
@@ -58,35 +58,18 @@ export const dbConnect = mysql.createConnection({
             } else {
               prevTime = entry.time;
               prevType = entry.type;
-              scheduledEvents[scheduledEvents.length - 1].push({
-                time: prevTime,
-                type: prevType,
-                duration: entry.duration,
-                description: entry.description,
-                number: entry.number,
-                occupied: entry.occupied,
-                visitors: [makeVisitorObject(entry)]
-              })
+              scheduledEvents[scheduledEvents.length - 1].push(makeAppointment(entry, prevTime, prevType))
             }
           } else {
             let event: any = {};
             prevDate = event.date = entry.date;
             prevTime = entry.time;
             prevType = entry.type
-            event.appointments = [{
-              time: prevTime,
-              type: prevType,
-              duration: entry.duration,
-              description: entry.description,
-              number: entry.number,
-              occupied: entry.occupied,
-              visitors: [makeVisitorObject(entry)]
-            }];
+            event.appointments = [makeAppointment(entry, prevTime, prevType)];
             scheduledEvents.push(event);
           }
             
         })
-        console.log(scheduledEvents);
         res.send(JSON.stringify(scheduledEvents));
       } else {
         res.json("No scheduled events");
@@ -94,7 +77,21 @@ export const dbConnect = mysql.createConnection({
     })
   }
 
-  let makeVisitorObject = (entry: any): any => {
+  const makeAppointment = (entry: any, prevTime: any, prevType: any) => {
+    return {
+      time: prevTime,
+      type: prevType,
+      patternId: entry.patternId,
+      eventId: entry.eventId,
+      duration: entry.duration,
+      description: entry.description,
+      number: entry.number,
+      occupied: entry.occupied,
+      visitors: [makeVisitorObject(entry)]
+    }
+  }
+
+  const makeVisitorObject = (entry: any): any => {
     return {
       name: entry.name,
       email: entry.email,
@@ -105,7 +102,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
     let respObjects: any[] = [];
     dbConnect.query(`select * from eventPattern;`, function(err: MysqlError, results: any, fields: any) {
       if(err) {
-        res.sendStatus(404).send("Data retrieval failed");
+        res.json("Data retrieval failed");
       } else if(results.length > 0) {
         results.forEach(function(entry: any) {
             let eventObject: any = {};
@@ -131,7 +128,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
                       order by date, time;`
     , function(err: MysqlError, results: any, fields: any) {
       if(err) {
-        res.sendStatus(404).send("Data retrieval failed");
+        res.json("Data retrieval failed");
       } else if(results.length > 0) {
         results.forEach(function(entry: any) {
           let eventObject: any = {};
@@ -157,7 +154,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
     dbConnect.query(`INSERT INTO eventPattern SET ?`, pattern,
     function(err: any, results: any, fields: any) {
       if(err) {
-        res.sendStatus(404).send("Data retrieval failed");
+        res.json("Data retrieval failed");
       } else {
         res.json("Successful");
       }
@@ -169,9 +166,9 @@ export let sendEventPatterns = (req: Request, res: Response) => {
     console.log(patternId);
     dbConnect.query(`delete from eventPattern where eventPattern.id = ?`, patternId, function(err: MysqlError, results: any, fields: any) {
       if(err) {
-        res.send("Data retrieval failed");
+        res.json("Data retrieval failed");
       } else {
-        res.send("Successful")
+        res.json("Successful")
       }
     })
   }
@@ -181,7 +178,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
     console.log(eventId);
     dbConnect.query(`delete from eventsList where eventsList.id = ?`, eventId, function(err: MysqlError, results: any, fields: any) {
       if(err) {
-        res.send("Data retrieval failed");
+        res.json("Data retrieval failed");
       } else {
         res.json("Successful");
       }
@@ -195,7 +192,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
     dbConnect.query(`insert into eventsList SET ? ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`
                       ,[event[0], event[0].time, event[0].date, event[0].patternId] , function(err: MysqlError, results: any, fields: any) {
       if(err) {
-        res.send("Data retrieval failed");
+        res.json("Data retrieval failed");
       } else {
         res.json("Successful");
       }
