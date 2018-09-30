@@ -19,12 +19,13 @@ export const dbConnect = mysql.createConnection({
         if(usr.length > 0) {
           if (req.body.password == usr[0].password) {
             req.session.user = req.body;
-            res.end();
+            delete req.session.user.password;
+            res.status(200).json();
           } else {
-            res.json("Incorrect password");
+            res.status(404).json("Incorrect password");
           }
         } else {
-            res.json("User not found");
+            res.status(404).json("User not found");
         }
       }
       
@@ -58,7 +59,7 @@ export const dbConnect = mysql.createConnection({
             } else {
               prevTime = entry.time;
               prevType = entry.type;
-              scheduledEvents[scheduledEvents.length - 1].push(makeAppointment(entry, prevTime, prevType))
+              scheduledEvents[scheduledEvents.length - 1].appointments.push(makeAppointment(entry, prevTime, prevType))
             }
           } else {
             let event: any = {};
@@ -86,7 +87,7 @@ export const dbConnect = mysql.createConnection({
       duration: entry.duration,
       description: entry.description,
       number: entry.number,
-      occupied: entry.occupied,
+      occupied: entry.occupied === null ? 0: entry.occupied,
       visitors: [makeVisitorObject(entry)]
     }
   }
@@ -137,7 +138,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
           eventObject.type = entry.type;
           eventObject.date = entry.date;
           eventObject.patternId = entry.patternId;
-          eventObject.occupied = entry.occupied;
+          eventObject.occupied = entry.occupied === null ? 0: entry.occupied;
           eventObject.number = entry.number;
           respObjects.push(eventObject);
         })
@@ -149,13 +150,20 @@ export let sendEventPatterns = (req: Request, res: Response) => {
   }
 
   export let addNewEventPattern = (req: Request, res: Response) => {
-    let pattern: any = req.body;
-    console.log(pattern);
-    dbConnect.query(`INSERT INTO eventPattern SET ?`, pattern,
+    let pattern: any[] = [req.body.type, req.body.number, req.body.duration, req.body.description
+      , req.body.type, req.body.number, req.body.duration];
+    //console.log(pattern);
+    dbConnect.query(`insert into eventPattern (type, number, duration, description)
+                      select ?, ?, ?, ?
+                      where not exists (select * from eventPattern where
+                      (type=? and number=? and duration=?));`, pattern,
     function(err: any, results: any, fields: any) {
+      
       if(err) {
+        console.log(err);
         res.json("Data retrieval failed");
       } else {
+        console.log(results.affectedRows)
         res.json("Successful");
       }
     })
@@ -180,6 +188,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
       if(err) {
         res.json("Data retrieval failed");
       } else {
+        console.log(results.affectedRows);
         res.json("Successful");
       }
     })

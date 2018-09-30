@@ -6,7 +6,6 @@ export let requireLogin = (req: Request, res: Response) => {
     console.log(req.session.user);
     if (!req.session.user) {
       res.redirect('/login');
-      console.log("redsir");
     } else {
         res.sendFile(path.join(__dirname, '../public/personal.html'));
     }
@@ -18,4 +17,5 @@ export let stopSession = (req: Request, res: Response) => {
         req.session.destroy(function(err: Error) {
            if(err) throw err;
         })
+        res.redirect("/");
     }

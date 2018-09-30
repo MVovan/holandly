@@ -3,6 +3,7 @@ import path from "path";
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import sessionStore from 'memorystore';
+import nodemailer from 'nodemailer';
 
 import * as userController from "./controllers/user";
 import * as userModel from "./models/user";

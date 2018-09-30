@@ -98,7 +98,8 @@ function makeVisitorsList(data) {
             TimeEvent.data = {
                 'date':data[d].date,
                 'time':timeEvents[t].time,
-                'eventId':DayEvents.id,
+                'eventId':timeEvents[t].eventId,
+                'patternId':timeEvents[t].patternId
             };
             let timeEnd = moment(timeEvents[t].time, 'hh:mm:ss');
             timeEnd.add(timeEvents[t].duration, 'minutes');
@@ -123,7 +124,7 @@ function makeVisitorsList(data) {
                 '<div class="row ">' +
                 '<div class="col-3 align-self-center">' +
                 '<div class="btn-group-vertical">' +
-                '<button type="button" class="btn btn-outline-success rescheduleVisitor">' +
+                '<button type="button" class="btn btn-outline-success rescheduleVisitor" data-toggle="modal" data-target="#newEventModal">' +
                 'Перепланировать' +
                 '</button>' +
                 '<button type="button" class="btn btn-outline-info removeVisitor">' +
@@ -160,27 +161,30 @@ function makeVisitorsList(data) {
             let element = document.getElementById(id);
             element.appendChild(tableVisitor);
             eventAmount++;
+            $("this .removeVisitor").click(
+                function () {
+                    alert(this);
+                });
         }
     }
     if (data.length > 0)
         document.getElementById('visitor-amount').innerText = eventAmount;
     $("#div-dashboard .rescheduleVisitor").click(
         function () {
-            console.log(this.parentNode.parentNode.data);
-            //updateEvent(this.parentNode.parentNode.data);
-            let data = this.parentNode.parentNode.data;
+            let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.data;
+            console.log(data);
             $("#modalPatternId").val(data.patternId);
             $("#modalEventId").val(data.eventId);
-            $("input#inputDate").val(data.eventDate);
-            $("#inputTime").val(data.eventTime);
-
+            $("input#inputDate").val(moment(data.date).format('YYYY-MM-DD'));
+            $("#inputTime").val(data.time);
         }
     );
 
     $("#div-dashboard .removeVisitor").click(
         function () {
-            console.log(this.parentNode.parentNode.data.eventId);
-            deleteEvent(this.parentNode.parentNode.data.eventId);
+            let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.data;
+            console.log(data.eventId);
+            deleteEvent(data.eventId);
         }
     );
 }
@@ -220,7 +224,7 @@ function makeEventsPoint(data) {
             let type = $('#pattern' + data[i].patternId);
             PatternEvent.innerHTML =
                 ' <div className="alert alert-success text-left" role="alert">' +
-                '<strong>' + data[i].patternId + '</strong><hr>';
+                '<strong>' + data[i].type + '</strong><hr>';
             eventField.appendChild(PatternEvent);
             eventAmount++;
         }
@@ -247,7 +251,7 @@ function makeEventsPoint(data) {
         eventCard.innerHTML +=
             '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
             '<a class="dropdown-item updateEvent" href="#" data-toggle="modal" data-target="#newEventModal">Перепланировать</a>' +
-            '<a class="dropdown-item delEvent" href="#">Отменить</a>' +
+            '<a class="dropdown-item delEvent" href="#" data='+eventCard.data+'>Отменить</a>' +
             '</div>';
         PatternEvent.appendChild(eventCard);
     }
@@ -255,34 +259,23 @@ function makeEventsPoint(data) {
         document.getElementById('event-amount').innerText = eventAmount;
     $("#div-event .updateEvent").click(
         function () {
-            console.log(this.parentNode.parentNode.data);
-            //updateEvent(this.parentNode.parentNode.data);
             let data = this.parentNode.parentNode.data;
+            console.log(data);
             $("#modalPatternId").val(data.patternId);
             $("#modalEventId").val(data.eventId);
             $("input#inputDate").val(moment(data.eventDate).format('YYYY-MM-DD'));
             $("#inputTime").val(data.eventTime);
-
         }
     );
 
     $("#div-event .delEvent").click(
         function () {
+
             let data = this.parentNode.parentNode.data;
             console.log(data.eventId);
             deleteEvent(data.eventId);
         }
     );
-}
-
-function formatDate(date) {
-    var dd = date.getDate();
-    if (dd < 10) dd = '0' + dd;
-    var mm = date.getMonth() + 1;
-    if (mm < 10) mm = '0' + mm;
-    var yy = date.getFullYear() % 100;
-    if (yy < 10) yy = '0' + yy;
-    return dd + '.' + mm + '.' + yy;
 }
 
 function putEvent(events) {
@@ -295,6 +288,7 @@ function putEvent(events) {
         success: function (data) {
             console.log(data);
             getEvents();
+            getVisitors();
         }
     });
 }
@@ -309,6 +303,7 @@ function deleteEvent(id) {
         success: function (data) {
             console.log(data);
             getEvents();
+            getVisitors();
         }
     });
 }

@@ -8,7 +8,6 @@ exports.requireLogin = (req, res) => {
     console.log(req.session.user);
     if (!req.session.user) {
         res.redirect('/login');
-        console.log("redsir");
     }
     else {
         res.sendFile(path_1.default.join(__dirname, '../public/personal.html'));
@@ -20,5 +19,6 @@ exports.stopSession = (req, res) => {
         if (err)
             throw err;
     });
+    res.redirect("/");
 };
 //# sourceMappingURL=user.js.map
