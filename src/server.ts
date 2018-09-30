@@ -60,6 +60,8 @@ app.delete('/pattern/*', userModel.deleteEventPattern)
 
 app.delete('/event/*', userModel.deleteEvent)
 
+app.delete('/cancel', userModel.deleteEventVisitor)
+
 app.post('/events', userModel.addEvent)
 
 app.listen(8130, () => {

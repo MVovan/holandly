@@ -54,6 +54,24 @@ window.onload = function () {
     getVisitors();
 };
 
+function logOut() {
+    console.log('logout');
+    $.ajax({
+        type: "get",
+        url: '/logout',
+        success: function (data, textStatus, request) {
+            $.ajax({
+                type: "get",
+                url: "/",
+                dataType: "html",
+                success: function (data, textStatus, request) {
+                    window.location = "/";
+                }
+            })
+        }
+    });
+}
+
 function getVisitors() {
     $.ajax({
         type: 'get',
@@ -70,6 +88,22 @@ function getVisitors() {
         success: function (data) {
             console.log(data);
             makeVisitorsList(data);
+        }
+    });
+}
+
+function cancelVisitor(data) {
+    console.log(data);
+    $.ajax({
+        type: "delete",
+        url: '/cancel',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function (data) {
+            console.log(data);
+            getEvents();
+            getVisitors();
         }
     });
 }
@@ -96,10 +130,10 @@ function makeVisitorsList(data) {
             TimeEvent.classList.add("accordion");
             TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
             TimeEvent.data = {
-                'date':data[d].date,
-                'time':timeEvents[t].time,
-                'eventId':timeEvents[t].eventId,
-                'patternId':timeEvents[t].patternId
+                'date': data[d].date,
+                'time': timeEvents[t].time,
+                'eventId': timeEvents[t].eventId,
+                'patternId': timeEvents[t].patternId
             };
             let timeEnd = moment(timeEvents[t].time, 'hh:mm:ss');
             timeEnd.add(timeEvents[t].duration, 'minutes');
@@ -113,7 +147,7 @@ function makeVisitorsList(data) {
                 '</div><div class="col-3"><strong>' +
                 timeEvents[t].type +
                 '</strong></div><div class="col-3">' +
-                'Усасников ' + timeEvents[t].occupied + ' из ' + timeEvents[t].number +
+                'Участников ' + timeEvents[t].occupied + ' из ' + timeEvents[t].number +
                 '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
                 'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
 
@@ -124,10 +158,10 @@ function makeVisitorsList(data) {
                 '<div class="row ">' +
                 '<div class="col-3 align-self-center">' +
                 '<div class="btn-group-vertical">' +
-                '<button type="button" class="btn btn-outline-success rescheduleVisitor" data-toggle="modal" data-target="#newEventModal">' +
+                '<button type="button" class="btn btn-outline-success reScheduledEvents" data-toggle="modal" data-target="#newEventModal">' +
                 'Перепланировать' +
                 '</button>' +
-                '<button type="button" class="btn btn-outline-info removeVisitor">' +
+                '<button type="button" data-toggle="modal" data-target="#removeModal" class="btn btn-outline-info removeScheduledEvents">' +
                 'Отменить' +
                 '</button>' +
                 '</div>' +
@@ -149,7 +183,10 @@ function makeVisitorsList(data) {
                     '<th scope="row">' + v + '</th>' +
                     '<td>' + visitorsEvents[v].name + '</td>' +
                     '<td>' + visitorsEvents[v].email + '</td>' +
-                    '<td><button type="button" class="btn btn-link">Отменить участие</button></td>' +
+                    '<td><button type="button" class="btn btn-link cancelVisitor" ' +
+                    'email="' + visitorsEvents[v].email + '" ' +
+                    'eventId="' + timeEvents[t].eventId + '"' +
+                    'data-toggle="modal" data-target="#removeModal">Отменить участие</button></td>' +
                     '</tr>';
             }
             tableVisitor.innerHTML +=
@@ -169,24 +206,50 @@ function makeVisitorsList(data) {
     }
     if (data.length > 0)
         document.getElementById('visitor-amount').innerText = eventAmount;
-    $("#div-dashboard .rescheduleVisitor").click(
+    $("#div-dashboard .reScheduledEvents").click(
         function () {
             let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.data;
             console.log(data);
-            $("#modalPatternId").val(data.patternId);
-            $("#modalEventId").val(data.eventId);
-            $("input#inputDate").val(moment(data.date).format('YYYY-MM-DD'));
-            $("#inputTime").val(data.time);
+            data.reason = false;
+            data.label = 'Изменить событие';
+            fillModalEventForm(data);
         }
     );
 
-    $("#div-dashboard .removeVisitor").click(
+    $("#div-dashboard .removeScheduledEvents").click(
         function () {
             let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.data;
-            console.log(data.eventId);
-            deleteEvent(data.eventId);
-        }
-    );
+            console.log(data);
+            $('.removeId').click(
+                function () {
+                    deleteEvent(data.eventId, $("#removeDescription").val());
+                });
+        });
+
+    $(".cancelVisitor").click(
+        function () {
+            let data = {};
+            data.email = this.getAttribute('email');
+            data.eventId = this.getAttribute('eventId');
+            console.log(data);
+            $('.removeId').click(
+                function () {
+                    data.reason = $("#removeDescription").val();
+                    cancelVisitor(data);
+                });
+        });
+}
+
+function fillModalEventForm(data) {
+    let modalE = $(".Reason");
+    modalE[0].hidden = data.reason;
+    let label = $("#newEventModalLabel");
+    label[0].innerText = data.label;
+    // $("#newEventModalLabel")[0].innerText('Изменить событие');
+    $("#modalPatternId").val(data.patternId);
+    $("#modalEventId").val(data.eventId);
+    $("input#inputDate").val(moment(data.date).format('YYYY-MM-DD'));
+    $("#inputTime").val(data.time);
 }
 
 function getEvents() {
@@ -219,7 +282,10 @@ function makeEventsPoint(data) {
         let PatternEvent = $('#PatternEvent' + data[i].patternId);
         if (PatternEvent.length === 0) {
             PatternEvent = document.createElement('div');
+            //if (i>1)
             PatternEvent.classList.add('alert', 'alert-success', 'text-left');
+            //else PatternEvent.classList.add('alert', 'alert-info', 'text-left');
+
             PatternEvent.id = 'PatternEvent' + data[i].patternId;
             let type = $('#pattern' + data[i].patternId);
             PatternEvent.innerHTML =
@@ -237,8 +303,8 @@ function makeEventsPoint(data) {
         eventCard.data = {
             patternId: data[i].patternId,
             eventId: data[i].id,
-            eventTime: data[i].time,
-            eventDate: data[i].date
+            time: data[i].time,
+            date: data[i].date
         };
 
         eventCard.innerHTML +=
@@ -246,12 +312,12 @@ function makeEventsPoint(data) {
             '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
             moment(data[i].date).format('DD/MM/YY') + '<br/>' +
             moment(data[i].time, 'hh:mm:ss').format("HH:mm") + '<br/>' +
-            'Своб.' + data[i].occupied + '/' + data[i].number +
+            'Своб.' + (data[i].number - data[i].occupied) + '/' + data[i].number +
             '</button>';
         eventCard.innerHTML +=
             '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
             '<a class="dropdown-item updateEvent" href="#" data-toggle="modal" data-target="#newEventModal">Перепланировать</a>' +
-            '<a class="dropdown-item delEvent" href="#" data='+eventCard.data+'>Отменить</a>' +
+            '<a class="dropdown-item delEvent" data-toggle="modal" data-target="#removeModal" href="#">Отменить</a>' +
             '</div>';
         PatternEvent.appendChild(eventCard);
     }
@@ -261,21 +327,21 @@ function makeEventsPoint(data) {
         function () {
             let data = this.parentNode.parentNode.data;
             console.log(data);
-            $("#modalPatternId").val(data.patternId);
-            $("#modalEventId").val(data.eventId);
-            $("input#inputDate").val(moment(data.eventDate).format('YYYY-MM-DD'));
-            $("#inputTime").val(data.eventTime);
+            data.reason = false;
+            data.label = 'Изменить событие';
+            fillModalEventForm(data);
         }
     );
 
     $("#div-event .delEvent").click(
         function () {
-
             let data = this.parentNode.parentNode.data;
-            console.log(data.eventId);
-            deleteEvent(data.eventId);
-        }
-    );
+            console.log(data);
+            $('.removeId').click(
+                function () {
+                    deleteEvent(data.eventId, $("#removeDescription").val());
+                });
+        });
 }
 
 function putEvent(events) {
@@ -293,12 +359,14 @@ function putEvent(events) {
     });
 }
 
-function deleteEvent(id) {
+function deleteEvent(id, description) {
+    console.log(id);
+    console.log(description);
     $.ajax({
         type: "delete",
         url: '/event/' + id,
         dataType: 'json',
-        data: '',
+        data: JSON.stringify({'Reason': description}),
         contentType: 'application/json',
         success: function (data) {
             console.log(data);
@@ -320,6 +388,7 @@ function newEvent() {
     event.patternId = $("#modalPatternId").val();
     event.date = $("input#inputDate").val();
     event.time = $("#inputTime").val();
+    event.reason = $("#reScheduledDescription").val()
     var events = [];
     events.push(event);
     console.log(events);
@@ -351,7 +420,7 @@ function makePatternCard(data) {
         let pattenn = data[i];
         var patternCard = document.createElement('div');
         patternCard.id = 'pattern' + pattenn.id;
-        patternCard.data = {'patternID': pattenn.id, 'patternType': pattenn.type};
+        patternCard.data = {'patternId': pattenn.id, 'patternType': pattenn.type};
         patternCard.classList.add('col-sm-4');
         patternCard.innerHTML +=
             '<div class = "card border-primary mb-4">' +
@@ -362,9 +431,9 @@ function makePatternCard(data) {
             '</button>' +
             '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
             '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
-            '<a class="dropdown-item delPater" href="#">Удалить</a>' +
+            '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
             '</div>' +
-            '<span class="badge badge-warning">' + patternCard.data.patternID + '</span></a>' +
+            '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
             '</div>' +
             '<div class = "card-body text-primary">' +
             '<p class="card-text">' + pattenn.description + '</p>' +
@@ -377,16 +446,22 @@ function makePatternCard(data) {
     }
     $("#pattern-row .newEvent").click(
         function () {
-            console.log(this.parentNode.parentNode.parentNode.parentNode.data.patternID);
-            $("#modalPatternId").val(this.parentNode.parentNode.parentNode.parentNode.data.patternID);
-            $("#modalEventId").val(0);
-
+            let data = this.parentNode.parentNode.parentNode.parentNode.data;
+            console.log(data);
+            data.eventId = 0;
+            data.reason = true;
+            data.label = 'Запланировать событие';
+            fillModalEventForm(data);
         }
     );
     $("#pattern-row .delPater").click(
         function () {
-            console.log(this.parentNode.parentNode.parentNode.parentNode.data.patternID);
-            deletePattern(this.parentNode.parentNode.parentNode.parentNode.data.patternID);
+            let data = this.parentNode.parentNode.parentNode.parentNode.data;
+            console.log(data);
+            $('.removeId').click(
+                function () {
+                    deletePattern(data.patternId, $("#removeDescription").val());
+                });
         }
     );
 }
@@ -420,13 +495,14 @@ function newPattern() {
     putPattern(pattern);
 }
 
-function deletePattern(id) {
+function deletePattern(id, description) {
     console.log(id);
+    console.log(description);
     $.ajax({
         type: "delete",
         url: '/pattern/' + id,
         dataType: 'json',
-        data: '',
+        data: JSON.stringify({'Reason': description}),
         contentType: 'application/json',
         success: function (data) {
             console.log(data);

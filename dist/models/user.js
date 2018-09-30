@@ -191,6 +191,19 @@ exports.deleteEvent = (req, res) => {
         }
     });
 };
+exports.deleteEventVisitor = (req, res) => {
+    let eventRecord = [req.body.eventId, req.body.email];
+    exports.dbConnect.query(`delete from eventVisitors where eventId = ? and visitorId = 
+    (select visitors.id from visitors where email=?)`, eventRecord, function (err, results, fields) {
+        if (err) {
+            res.json("Data retrieval failed");
+        }
+        else {
+            console.log(results.affectedRows);
+            res.json("Successful");
+        }
+    });
+};
 exports.addEvent = (req, res) => {
     let event = req.body;
     console.log(req.body);

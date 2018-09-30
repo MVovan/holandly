@@ -194,6 +194,19 @@ export let sendEventPatterns = (req: Request, res: Response) => {
     })
   }
 
+  export let deleteEventVisitor = (req: Request, res: Response) => {
+    let eventRecord: any = [req.body.eventId, req.body.email];
+    dbConnect.query(`delete from eventVisitors where eventId = ? and visitorId = 
+    (select visitors.id from visitors where email=?)`, eventRecord, function(err: MysqlError, results: any, fields: any) {
+      if(err) {
+        res.json("Data retrieval failed");
+      } else {
+        console.log(results.affectedRows);
+        res.json("Successful");
+      }
+    })
+  }
+
   export let addEvent = (req: Request, res: Response) => {
     let event: any = req.body;
     console.log(req.body);

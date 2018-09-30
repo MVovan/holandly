@@ -48,6 +48,7 @@ app.post('/pattern', userModel.addNewEventPattern);
 /* deletes the pattern by id specified in params, and then deletes all the events  */
 app.delete('/pattern/*', userModel.deleteEventPattern);
 app.delete('/event/*', userModel.deleteEvent);
+app.delete('/cancel', userModel.deleteEventVisitor);
 app.post('/events', userModel.addEvent);
 app.listen(8130, () => {
     console.log('wat up');
