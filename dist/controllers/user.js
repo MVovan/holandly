@@ -7,6 +7,7 @@ const path_1 = __importDefault(require("path"));
 exports.requireLogin = (req, res) => {
     console.log(req.session.user);
     if (!req.session.user) {
+        res.set("WWW-Authenticate", "Basic");
         res.redirect('/login');
     }
     else {

@@ -16,33 +16,34 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `eventVisitors`
+-- Table structure for table `eventpattern`
 --
 
-DROP TABLE IF EXISTS `eventVisitors`;
+DROP TABLE IF EXISTS `eventpattern`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `eventVisitors` (
-  `eventId` int(11) NOT NULL,
-  `visitorId` int(11) NOT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `visitorId` (`visitorId`),
-  KEY `eventVisitors_ibfk_1` (`eventId`),
-  CONSTRAINT `eventVisitors_ibfk_1` FOREIGN KEY (`eventId`) REFERENCES `eventsList` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `eventVisitors_ibfk_2` FOREIGN KEY (`visitorId`) REFERENCES `visitors` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+CREATE TABLE `eventpattern` (
+  `patternId` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(40) NOT NULL,
+  `number` smallint(6) NOT NULL,
+  `duration` smallint(6) NOT NULL,
+  `description` text,
+  `userId` int(11) NOT NULL,
+  PRIMARY KEY (`patternId`),
+  UNIQUE KEY `id_UNIQUE` (`patternId`),
+  KEY `fk_eventpattern_1_idx` (`userId`),
+  CONSTRAINT `fk_eventpattern_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `eventVisitors`
+-- Dumping data for table `eventpattern`
 --
 
-LOCK TABLES `eventVisitors` WRITE;
-/*!40000 ALTER TABLE `eventVisitors` DISABLE KEYS */;
-INSERT INTO `eventVisitors` VALUES (1,1,1),(5,1,2),(5,2,3),(5,3,4),(2,2,5);
-/*!40000 ALTER TABLE `eventVisitors` ENABLE KEYS */;
+LOCK TABLES `eventpattern` WRITE;
+/*!40000 ALTER TABLE `eventpattern` DISABLE KEYS */;
+INSERT INTO `eventpattern` VALUES (1,'test',1,40,'blabla',1),(2,'exam',1,30,'wtf',1),(3,'hackathon',10,240,'lil hack',1),(9,'exam',1,22,'wat up',1);
+/*!40000 ALTER TABLE `eventpattern` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -54,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-09-24 19:10:26
+-- Dump completed on 2018-10-05 18:31:52

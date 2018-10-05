@@ -16,32 +16,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `eventsList`
+-- Table structure for table `eventslist`
 --
 
-DROP TABLE IF EXISTS `eventsList`;
+DROP TABLE IF EXISTS `eventslist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `eventsList` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `eventslist` (
+  `eventId` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `time` time NOT NULL,
   `patternId` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
+  PRIMARY KEY (`eventId`),
+  UNIQUE KEY `id` (`eventId`),
   KEY `id_idx` (`patternId`),
-  CONSTRAINT `id` FOREIGN KEY (`patternId`) REFERENCES `eventPattern` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+  CONSTRAINT `id` FOREIGN KEY (`patternId`) REFERENCES `eventpattern` (`patternId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `eventsList`
+-- Dumping data for table `eventslist`
 --
 
-LOCK TABLES `eventsList` WRITE;
-/*!40000 ALTER TABLE `eventsList` DISABLE KEYS */;
-INSERT INTO `eventsList` VALUES (1,'2018-11-11','12:30:00',1),(2,'2018-12-12','11:11:00',1),(3,'2018-10-09','12:00:00',2),(5,'2018-09-10','10:00:00',3);
-/*!40000 ALTER TABLE `eventsList` ENABLE KEYS */;
+LOCK TABLES `eventslist` WRITE;
+/*!40000 ALTER TABLE `eventslist` DISABLE KEYS */;
+INSERT INTO `eventslist` VALUES (4,'2018-10-12','10:00:00',1),(5,'2018-11-30','11:11:00',3),(6,'2018-10-02','00:00:00',3);
+/*!40000 ALTER TABLE `eventslist` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-09-24 19:10:26
+-- Dump completed on 2018-10-05 18:31:52

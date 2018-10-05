@@ -16,31 +16,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `eventPattern`
+-- Table structure for table `eventvisitors`
 --
 
-DROP TABLE IF EXISTS `eventPattern`;
+DROP TABLE IF EXISTS `eventvisitors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `eventPattern` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(40) NOT NULL,
-  `number` smallint(6) NOT NULL,
-  `duration` smallint(6) NOT NULL,
-  `description` text,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+CREATE TABLE `eventvisitors` (
+  `eventId` int(11) NOT NULL,
+  `visitorId` int(11) NOT NULL,
+  `evId` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`evId`),
+  UNIQUE KEY `id_UNIQUE` (`evId`),
+  KEY `visitorId` (`visitorId`),
+  KEY `eventVisitors_ibfk_1` (`eventId`),
+  CONSTRAINT `eventvisitors_ibfk_1` FOREIGN KEY (`eventId`) REFERENCES `eventslist` (`eventId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventvisitors_ibfk_2` FOREIGN KEY (`visitorId`) REFERENCES `visitors` (`visitorId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `eventPattern`
+-- Dumping data for table `eventvisitors`
 --
 
-LOCK TABLES `eventPattern` WRITE;
-/*!40000 ALTER TABLE `eventPattern` DISABLE KEYS */;
-INSERT INTO `eventPattern` VALUES (1,'test',1,40,'blabla'),(2,'exam',1,30,'wtf'),(3,'hackathon',10,240,'lil hack');
-/*!40000 ALTER TABLE `eventPattern` ENABLE KEYS */;
+LOCK TABLES `eventvisitors` WRITE;
+/*!40000 ALTER TABLE `eventvisitors` DISABLE KEYS */;
+/*!40000 ALTER TABLE `eventvisitors` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -52,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-09-24 19:10:26
+-- Dump completed on 2018-10-05 18:31:52

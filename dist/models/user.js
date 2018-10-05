@@ -11,12 +11,11 @@ exports.dbConnect = mysql_1.default.createConnection({
     database: 'holandly'
 });
 exports.validateUser = (req, res) => {
-    exports.dbConnect.query('select * from holandly.users where email=?', [req.body.email], function (err, usr, fields) {
+    exports.dbConnect.query('select * from holandly.users where login=?', [req.body.email], function (err, usr, fields) {
         if (err) {
             console.log(err);
         }
         else {
-            //console.log(usr[0].password);
             if (usr.length > 0) {
                 if (req.body.password == usr[0].password) {
                     req.session.user = req.body;
@@ -24,23 +23,23 @@ exports.validateUser = (req, res) => {
                     res.status(200).json();
                 }
                 else {
-                    res.status(404).json("Incorrect password");
+                    res.status(401).json("Incorrect password");
                 }
             }
             else {
-                res.status(404).json("User not found");
+                res.status(401).json("User not found");
             }
         }
     });
 };
 exports.sendScheduledEvents = (req, res) => {
-    exports.dbConnect.query(`select visitors.name, visitors.email, eventsList.date, eventsList.time, eventsList.patternId, eventVisitors.eventId, eventPattern.type, eventPattern.number,
-                eventPattern.duration, eventPattern.description, visitCount.occupied from holandly.eventVisitors
-                inner join visitors on eventVisitors.visitorId = visitors.id
-                inner join eventsList on eventVisitors.eventId = eventsList.id
-                inner join eventPattern on eventsList.patternId = eventPattern.id
-                left join (select eventId, COUNT(*) AS occupied from eventVisitors group by eventId) AS visitCount on eventsList.id = visitCount.eventId
-                order by eventsList.date, eventsList.time, eventPattern.type;`, function (err, results, fields) {
+    exports.dbConnect.query(`select visitors.name, visitors.email, eventslist.date, eventslist.time, eventslist.patternId, eventvisitors.eventId, eventpattern.type, eventpattern.number,
+                eventpattern.duration, eventpattern.description, visitCount.occupied from holandly.eventvisitors
+                inner join visitors on eventvisitors.visitorId = visitors.visitorId
+                inner join eventslist on eventvisitors.eventId = eventslist.eventId
+                inner join eventpattern on eventslist.patternId = eventpattern.patternId
+                left join (select eventId, COUNT(*) AS occupied from eventvisitors group by eventId) AS visitCount on eventslist.eventId = visitCount.eventId
+                order by eventslist.date, eventslist.time, eventpattern.type;`, function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
         }
@@ -99,7 +98,7 @@ const makeVisitorObject = (entry) => {
 };
 exports.sendEventPatterns = (req, res) => {
     let respObjects = [];
-    exports.dbConnect.query(`select * from eventPattern;`, function (err, results, fields) {
+    exports.dbConnect.query(`select * from eventpattern;`, function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
         }
@@ -122,9 +121,9 @@ exports.sendEventPatterns = (req, res) => {
 };
 exports.sendAvailableEvents = (req, res) => {
     let respObjects = [];
-    exports.dbConnect.query(`select eventsList.*, visitCount.occupied, eventPattern.number, eventPattern.type from holandly.eventsList
-                      inner join eventPattern on eventsList.patternId = eventPattern.id
-                      left join (select eventId, COUNT(*) AS occupied from eventVisitors group by eventId) AS visitCount on eventsList.id = visitCount.eventId
+    exports.dbConnect.query(`select eventslist.*, visitCount.occupied, eventpattern.number, eventpattern.type from holandly.eventslist
+                      inner join eventpattern on eventslist.patternId = eventpattern.patternId
+                      left join (select eventId, COUNT(*) AS occupied from eventvisitors group by eventId) AS visitCount on eventslist.eventId = visitCount.eventId
                       order by date, time;`, function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
@@ -152,9 +151,9 @@ exports.addNewEventPattern = (req, res) => {
     let pattern = [req.body.type, req.body.number, req.body.duration, req.body.description,
         req.body.type, req.body.number, req.body.duration];
     //console.log(pattern);
-    exports.dbConnect.query(`insert into eventPattern (type, number, duration, description)
+    exports.dbConnect.query(`insert into eventpattern (type, number, duration, description)
                       select ?, ?, ?, ?
-                      where not exists (select * from eventPattern where
+                      where not exists (select * from eventpattern where
                       (type=? and number=? and duration=?));`, pattern, function (err, results, fields) {
         if (err) {
             console.log(err);
@@ -169,7 +168,7 @@ exports.addNewEventPattern = (req, res) => {
 exports.deleteEventPattern = (req, res) => {
     let patternId = req.params[0];
     console.log(patternId);
-    exports.dbConnect.query(`delete from eventPattern where eventPattern.id = ?`, patternId, function (err, results, fields) {
+    exports.dbConnect.query(`delete from eventpattern where eventpattern.patternId = ?`, patternId, function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
         }
@@ -181,7 +180,7 @@ exports.deleteEventPattern = (req, res) => {
 exports.deleteEvent = (req, res) => {
     let eventId = req.params[0];
     console.log(eventId);
-    exports.dbConnect.query(`delete from eventsList where eventsList.id = ?`, eventId, function (err, results, fields) {
+    exports.dbConnect.query(`delete from eventslist where eventslist.eventId = ?`, eventId, function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
         }
@@ -193,8 +192,8 @@ exports.deleteEvent = (req, res) => {
 };
 exports.deleteEventVisitor = (req, res) => {
     let eventRecord = [req.body.eventId, req.body.email];
-    exports.dbConnect.query(`delete from eventVisitors where eventId = ? and visitorId = 
-    (select visitors.id from visitors where email=?)`, eventRecord, function (err, results, fields) {
+    exports.dbConnect.query(`delete from eventvisitors where eventId = ? and visitorId = 
+    (select visitors.visitorId from visitors where email=?)`, eventRecord, function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
         }
@@ -205,10 +204,12 @@ exports.deleteEventVisitor = (req, res) => {
     });
 };
 exports.addEvent = (req, res) => {
+    console.log(req.session);
     let event = req.body;
+    delete event[0].reason;
     console.log(req.body);
     console.log(event[0].time + "" + event[0].date);
-    exports.dbConnect.query(`insert into eventsList SET ? ON DUPLICATE KEY UPDATE time=?, date=?, patternId=?`, [event[0], event[0].time, event[0].date, event[0].patternId], function (err, results, fields) {
+    exports.dbConnect.query(`insert into eventslist SET ? ON DUPLICATE KEY UPDATE time=?,date=?, patternId=?`, [event[0], event[0].time, event[0].date, event[0].patternId], function (err, results, fields) {
         if (err) {
             res.json("Data retrieval failed");
         }

@@ -23,13 +23,13 @@ DROP TABLE IF EXISTS `visitors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `visitors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `visitorId` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(40) NOT NULL,
   `email` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  UNIQUE KEY `id_2` (`id`),
-  UNIQUE KEY `id_3` (`id`)
+  PRIMARY KEY (`visitorId`),
+  UNIQUE KEY `id` (`visitorId`),
+  UNIQUE KEY `id_2` (`visitorId`),
+  UNIQUE KEY `id_3` (`visitorId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -52,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-09-24 19:10:26
+-- Dump completed on 2018-10-05 18:31:52

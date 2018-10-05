@@ -3,10 +3,9 @@ import path from "path";
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import sessionStore from 'memorystore';
-import nodemailer from 'nodemailer';
-
 import * as userController from "./controllers/user";
 import * as userModel from "./models/user";
+import morgan from 'morgan';
 
 userModel.dbConnect;
 
@@ -16,6 +15,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.text());
+app.use(morgan(':method :url :status :res[content-length]'));
 
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -29,8 +29,8 @@ app.use(session({
   })
 }))
 
-
 app.get('/login', (req: Request, res: Response) => {
+  res.set("WWW-Authenticate", "Basic")
   res.sendFile(path.join(__dirname, 'public/login/Signin.html'));
 })
 

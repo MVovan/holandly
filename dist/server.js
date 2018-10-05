@@ -17,11 +17,13 @@ const express_session_1 = __importDefault(require("express-session"));
 const memorystore_1 = __importDefault(require("memorystore"));
 const userController = __importStar(require("./controllers/user"));
 const userModel = __importStar(require("./models/user"));
+const morgan_1 = __importDefault(require("morgan"));
 userModel.dbConnect;
 const memoryStore = memorystore_1.default(express_session_1.default);
 const app = express_1.default();
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.text());
+app.use(morgan_1.default(':method :url :status :res[content-length]'));
 app.use(express_1.default.static(path_1.default.join(__dirname, 'public')));
 app.use(express_session_1.default({
     secret: 'waffle',
@@ -32,6 +34,7 @@ app.use(express_session_1.default({
     })
 }));
 app.get('/login', (req, res) => {
+    res.set("WWW-Authenticate", "Basic");
     res.sendFile(path_1.default.join(__dirname, 'public/login/Signin.html'));
 });
 app.post('/login', userModel.validateUser);
