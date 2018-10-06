@@ -1,3 +1,4 @@
+
 window.onload = function () {
     console.log('------------------>');
     $(function () {
@@ -113,97 +114,99 @@ function makeVisitorsList(data) {
     let visitorsField = document.getElementById('div-dashboard');
     visitorsField.innerHTML = '';
     let eventAmount = 0;
+    if (typeof data === "object") {
+        for (let d = 0; d < data.length; d++) {
+            let DayEvents = document.createElement('div');
+            DayEvents.id = 'dateEvent' + d;
+            DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
+            DayEvents.innerHTML = '<strong>' + moment(data[d].date).format('DD/MM/YYYY') + '</strong><hr>';
+            let visitorsListColapse = document.createElement('div');
+            visitorsListColapse.classList.add("accordion");
+            visitorsListColapse.id = 'accordionVisitorsList' + DayEvents.id;
+            visitorsField.appendChild(DayEvents);
 
-    for (let d = 0; d < data.length; d++) {
-        let DayEvents = document.createElement('div');
-        DayEvents.id = 'dateEvent' + d;
-        DayEvents.classList.add('shadow-lg', 'p-3', 'mb-5', 'bg-white', 'rounded');
-        DayEvents.innerHTML = '<strong>' + moment(data[d].date).format('DD/MM/YYYY') + '</strong><hr>';
-        let visitorsListColapse = document.createElement('div');
-        visitorsListColapse.classList.add("accordion");
-        visitorsListColapse.id = 'accordionVisitorsList' + DayEvents.id;
-        visitorsField.appendChild(DayEvents);
+            let timeEvents = data[d].appointments;
+            for (let t = 0; t < timeEvents.length; t++) {
+                let TimeEvent = document.createElement('div');
+                TimeEvent.classList.add("accordion");
+                TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
+                TimeEvent.data = {
+                    'date': data[d].date,
+                    'time': timeEvents[t].time,
+                    'eventId': timeEvents[t].eventId,
+                    'patternId': timeEvents[t].patternId
+                };
+                let timeEnd = moment(timeEvents[t].time, 'hh:mm:ss');
+                timeEnd.add(timeEvents[t].duration, 'minutes');
+                TimeEvent.innerHTML +=
+                    '<div class="card">' +
+                    '<div class="card-header" id="heading' + eventAmount + '">' +
+                    '<div class="row ">' +
+                    '<div class="col-3">' +
+                    moment(timeEvents[t].time, 'hh:mm:ss').format("HH:mm") + '-' +
+                    moment(timeEnd, 'mm').format("HH:mm") +
+                    '</div><div class="col-3"><strong>' +
+                    timeEvents[t].type +
+                    '</strong></div><div class="col-3">' +
+                    'Участников ' + timeEvents[t].occupied + ' из ' + timeEvents[t].number +
+                    '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
+                    'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
 
-        let timeEvents = data[d].appointments;
-        for (let t = 0; t < timeEvents.length; t++) {
-            let TimeEvent = document.createElement('div');
-            TimeEvent.classList.add("accordion");
-            TimeEvent.id = 'accordionVisitorsList' + DayEvents.id;
-            TimeEvent.data = {
-                'date': data[d].date,
-                'time': timeEvents[t].time,
-                'eventId': timeEvents[t].eventId,
-                'patternId': timeEvents[t].patternId
-            };
-            let timeEnd = moment(timeEvents[t].time, 'hh:mm:ss');
-            timeEnd.add(timeEvents[t].duration, 'minutes');
-            TimeEvent.innerHTML +=
-                '<div class="card">' +
-                '<div class="card-header" id="heading' + eventAmount + '">' +
-                '<div class="row ">' +
-                '<div class="col-3">' +
-                moment(timeEvents[t].time, 'hh:mm:ss').format("HH:mm") + '-' +
-                moment(timeEnd, 'mm').format("HH:mm") +
-                '</div><div class="col-3"><strong>' +
-                timeEvents[t].type +
-                '</strong></div><div class="col-3">' +
-                'Участников ' + timeEvents[t].occupied + ' из ' + timeEvents[t].number +
-                '</div><div class="col text-right"><a href="#" data-toggle="collapse" data-target="#collapse' + eventAmount + '" aria-expanded="false"' +
-                'aria-controls="collapse' + eventAmount + '">Дополнительно</a></div></div></div>';
+                TimeEvent.innerHTML +=
+                    '<div id="collapse' + eventAmount + '" class="collapse " aria-labelledby="heading' + eventAmount + '"' +
+                    'data-parent="#' + TimeEvent.id + '">' +
+                    '<div class="container align-items-center">' +
+                    '<div class="row ">' +
+                    '<div class="col-3 align-self-center">' +
+                    '<div class="btn-group-vertical">' +
+                    '<button type="button" class="btn btn-outline-success reScheduledEvents" data-toggle="modal" data-target="#newEventModal">' +
+                    'Перепланировать' +
+                    '</button>' +
+                    '<button type="button" data-toggle="modal" data-target="#removeModal" class="btn btn-outline-info removeScheduledEvents">' +
+                    'Отменить' +
+                    '</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="col-7 " id="visitorsTable' + eventAmount + '">';
+                let tableVisitor = document.createElement('table');
+                tableVisitor.classList.add('table', 'table-sm')
+                tableVisitor.innerHTML =
+                    '<thead><tr><td>#</td>' +
+                    '<td>Имя</td>' +
+                    '<td>E-mail</td>' +
+                    '<td>Отмена участия</td>' +
+                    '</tr></thead><tbody>';
 
-            TimeEvent.innerHTML +=
-                '<div id="collapse' + eventAmount + '" class="collapse " aria-labelledby="heading' + eventAmount + '"' +
-                'data-parent="#' + TimeEvent.id + '">' +
-                '<div class="container align-items-center">' +
-                '<div class="row ">' +
-                '<div class="col-3 align-self-center">' +
-                '<div class="btn-group-vertical">' +
-                '<button type="button" class="btn btn-outline-success reScheduledEvents" data-toggle="modal" data-target="#newEventModal">' +
-                'Перепланировать' +
-                '</button>' +
-                '<button type="button" data-toggle="modal" data-target="#removeModal" class="btn btn-outline-info removeScheduledEvents">' +
-                'Отменить' +
-                '</button>' +
-                '</div>' +
-                '</div>' +
-                '<div class="col-7 " id="visitorsTable' + eventAmount + '">';
-            let tableVisitor = document.createElement('table');
-            tableVisitor.classList.add('table', 'table-sm')
-            tableVisitor.innerHTML =
-                '<thead><tr><td>#</td>' +
-                '<td>Имя</td>' +
-                '<td>E-mail</td>' +
-                '<td>Отмена участия</td>' +
-                '</tr></thead><tbody>';
-
-            let visitorsEvents = timeEvents[t].visitors;
-            for (let v = 0; v < visitorsEvents.length; v++) {
+                let visitorsEvents = timeEvents[t].visitors;
+                for (let v = 0; v < visitorsEvents.length; v++) {
+                    tableVisitor.innerHTML +=
+                        '<tr>' +
+                        '<th scope="row">' + v + '</th>' +
+                        '<td>' + visitorsEvents[v].name + '</td>' +
+                        '<td>' + visitorsEvents[v].email + '</td>' +
+                        '<td><button type="button" class="btn btn-link cancelVisitor" ' +
+                        'email="' + visitorsEvents[v].email + '" ' +
+                        'eventId="' + timeEvents[t].eventId + '"' +
+                        'data-toggle="modal" data-target="#removeModal">Отменить участие</button></td>' +
+                        '</tr>';
+                }
                 tableVisitor.innerHTML +=
-                    '<tr>' +
-                    '<th scope="row">' + v + '</th>' +
-                    '<td>' + visitorsEvents[v].name + '</td>' +
-                    '<td>' + visitorsEvents[v].email + '</td>' +
-                    '<td><button type="button" class="btn btn-link cancelVisitor" ' +
-                    'email="' + visitorsEvents[v].email + '" ' +
-                    'eventId="' + timeEvents[t].eventId + '"' +
-                    'data-toggle="modal" data-target="#removeModal">Отменить участие</button></td>' +
-                    '</tr>';
+                    '</tbody>' +
+                    '</table>';
+                visitorsListColapse.appendChild(TimeEvent);
+                DayEvents.appendChild(visitorsListColapse);
+                let id = 'visitorsTable' + eventAmount;
+                let element = document.getElementById(id);
+                element.appendChild(tableVisitor);
+                eventAmount++;
+                $("this .removeVisitor").click(
+                    function () {
+                        alert(this);
+                    });
             }
-            tableVisitor.innerHTML +=
-                '</tbody>' +
-                '</table>';
-            visitorsListColapse.appendChild(TimeEvent);
-            DayEvents.appendChild(visitorsListColapse);
-            let id = 'visitorsTable' + eventAmount;
-            let element = document.getElementById(id);
-            element.appendChild(tableVisitor);
-            eventAmount++;
-            $("this .removeVisitor").click(
-                function () {
-                    alert(this);
-                });
         }
     }
+
     if (data.length > 0)
         document.getElementById('visitor-amount').innerText = eventAmount;
     $("#div-dashboard .reScheduledEvents").click(
@@ -277,51 +280,53 @@ function makeEventsPoint(data) {
     let eventField = document.getElementById('div-event');
     eventField.innerHTML = '';
     let eventAmount = 0;
-    for (let i = 0; i < data.length; i++) {
+    if (typeof data === "object") {
+        for (let i = 0; i < data.length; i++) {
 
-        let PatternEvent = $('#PatternEvent' + data[i].patternId);
-        if (PatternEvent.length === 0) {
-            PatternEvent = document.createElement('div');
-            //if (i>1)
-            PatternEvent.classList.add('alert', 'alert-success', 'text-left');
-            //else PatternEvent.classList.add('alert', 'alert-info', 'text-left');
+            let PatternEvent = $('#PatternEvent' + data[i].patternId);
+            if (PatternEvent.length === 0) {
+                PatternEvent = document.createElement('div');
+                //if (i>1)
+                PatternEvent.classList.add('alert', 'alert-success', 'text-left');
+                //else PatternEvent.classList.add('alert', 'alert-info', 'text-left');
 
-            PatternEvent.id = 'PatternEvent' + data[i].patternId;
-            let type = $('#pattern' + data[i].patternId);
-            PatternEvent.innerHTML =
-                ' <div className="alert alert-success text-left" role="alert">' +
-                '<strong>' + data[i].type + '</strong><hr>';
-            eventField.appendChild(PatternEvent);
-            eventAmount++;
+                PatternEvent.id = 'PatternEvent' + data[i].patternId;
+                let type = $('#pattern' + data[i].patternId);
+                PatternEvent.innerHTML =
+                    ' <div className="alert alert-success text-left" role="alert">' +
+                    '<strong>' + data[i].type + '</strong><hr>';
+                eventField.appendChild(PatternEvent);
+                eventAmount++;
+            }
+            else
+                PatternEvent = PatternEvent[0];
+
+            let eventCard = document.createElement('div');
+            eventCard.classList.add("btn-group");
+            eventCard.role = "group";
+            eventCard.data = {
+                patternId: data[i].patternId,
+                eventId: data[i].eventId,
+                time: data[i].time,
+                date: data[i].date
+            };
+
+            eventCard.innerHTML +=
+                '<button id="btnGroupDrop2" type="button" class="btn btn-outline-dark dropdown-toggle"' +
+                '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                moment(data[i].date).format('DD/MM/YY') + '<br/>' +
+                moment(data[i].time, 'hh:mm:ss').format("HH:mm") + '<br/>' +
+                'Своб.' + (data[i].number - data[i].occupied) + '/' + data[i].number +
+                '</button>';
+            eventCard.innerHTML +=
+                '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+                '<a class="dropdown-item updateEvent" href="#" data-toggle="modal" data-target="#newEventModal">Перепланировать</a>' +
+                '<a class="dropdown-item delEvent" data-toggle="modal" data-target="#removeModal" href="#">Отменить</a>' +
+                '</div>';
+            PatternEvent.appendChild(eventCard);
         }
-        else
-            PatternEvent = PatternEvent[0];
-
-        let eventCard = document.createElement('div');
-        eventCard.classList.add("btn-group");
-        eventCard.role = "group";
-        eventCard.data = {
-            patternId: data[i].patternId,
-            eventId: data[i].id,
-            time: data[i].time,
-            date: data[i].date
-        };
-
-        eventCard.innerHTML +=
-            '<button id="btnGroupDrop2" type="button" class="btn btn-outline-dark dropdown-toggle"' +
-            '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-            moment(data[i].date).format('DD/MM/YY') + '<br/>' +
-            moment(data[i].time, 'hh:mm:ss').format("HH:mm") + '<br/>' +
-            'Своб.' + (data[i].number - data[i].occupied) + '/' + data[i].number +
-            '</button>';
-        eventCard.innerHTML +=
-            '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-            '<a class="dropdown-item updateEvent" href="#" data-toggle="modal" data-target="#newEventModal">Перепланировать</a>' +
-            '<a class="dropdown-item delEvent" data-toggle="modal" data-target="#removeModal" href="#">Отменить</a>' +
-            '</div>';
-        PatternEvent.appendChild(eventCard);
     }
-    if (eventAmount > 0)
+
         document.getElementById('event-amount').innerText = eventAmount;
     $("#div-event .updateEvent").click(
         function () {
@@ -345,6 +350,7 @@ function makeEventsPoint(data) {
 }
 
 function putEvent(events) {
+    console.log(events);
     $.ajax({
         type: "POST",
         url: '/events',
@@ -364,7 +370,7 @@ function deleteEvent(id, description) {
     console.log(description);
     $.ajax({
         type: "delete",
-        url: '/event/' + id,
+        url: '/events/' + id,
         dataType: 'json',
         data: JSON.stringify({'Reason': description}),
         contentType: 'application/json',
@@ -381,10 +387,11 @@ function newEvent() {
         "patternId": 0,
         "time": 0,
         "date": 0,
-        "id": null
+        "eventId": null
     };
     let id = $("#modalEventId").val();
-    if (id !== 0) event.id = id;
+    if (id !== '0') event.eventId = id;
+    else event.eventId = null;
     event.patternId = $("#modalPatternId").val();
     event.date = $("input#inputDate").val();
     event.time = $("#inputTime").val();
@@ -413,37 +420,42 @@ function getPatterns() {
 }
 
 function makePatternCard(data) {
-    var patternField = document.getElementById('pattern-row');
+    let patternField = document.getElementById('pattern-row');
     patternField.innerHTML = '';
-    document.getElementById('pattern-amount').innerText = data.length;
-    for (let i = 0; i < data.length; i++) {
-        let pattenn = data[i];
-        var patternCard = document.createElement('div');
-        patternCard.id = 'pattern' + pattenn.id;
-        patternCard.data = {'patternId': pattenn.id, 'patternType': pattenn.type};
-        patternCard.classList.add('col-sm-4');
-        patternCard.innerHTML +=
-            '<div class = "card border-primary mb-4">' +
-            '<div class = "card-header">' +
-            '<button id="btnGroupDrop2" type="button" class="btn btn-link dropdown-toggle"' +
-            '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-            '<strong>' + pattenn.type + '</strong>' +
-            '</button>' +
-            '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-            '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
-            '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
-            '</div>' +
-            '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
-            '</div>' +
-            '<div class = "card-body text-primary">' +
-            '<p class="card-text">' + pattenn.description + '</p>' +
-            '<h6 class="card-title">Количество учасников: ' + pattenn.number + '</h6>\n' +
-            '<h6 class="card-title">Продолжительность: ' + pattenn.duration + ' мин</h6>';
-        // '<button type="button" class="btn btn-primary"' +
-        // 'data-toggle="modal" data-target="#newEventModal">' +
-        // ' +Добавить в расписание </button>';
-        patternField.appendChild(patternCard);
+    let patternAmount = 0;
+    document.getElementById('pattern-amount').innerText = 0;
+    if (typeof data === "object") {
+        patternAmount = data.length;
+        for (let i = 0; i < data.length; i++) {
+            let pattenn = data[i];
+            var patternCard = document.createElement('div');
+            patternCard.id = 'pattern' + pattenn.patternId;
+            patternCard.data = {'patternId': pattenn.patternId, 'patternType': pattenn.type};
+            patternCard.classList.add('col-sm-4');
+            patternCard.innerHTML +=
+                '<div class = "card border-primary mb-4">' +
+                '<div class = "card-header">' +
+                '<button id="btnGroupDrop2" type="button" class="btn btn-link dropdown-toggle"' +
+                '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                '<strong>' + pattenn.type + '</strong>' +
+                '</button>' +
+                '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+                '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
+                '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
+                '</div>' +
+                '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
+                '</div>' +
+                '<div class = "card-body text-primary">' +
+                '<p class="card-text">' + pattenn.description + '</p>' +
+                '<h6 class="card-title">Количество учасников: ' + pattenn.number + '</h6>\n' +
+                '<h6 class="card-title">Продолжительность: ' + pattenn.duration + ' мин</h6>';
+            // '<button type="button" class="btn btn-primary"' +
+            // 'data-toggle="modal" data-target="#newEventModal">' +
+            // ' +Добавить в расписание </button>';
+            patternField.appendChild(patternCard);
+        }
     }
+    document.getElementById('pattern-amount').innerText = patternAmount;
     $("#pattern-row .newEvent").click(
         function () {
             let data = this.parentNode.parentNode.parentNode.parentNode.data;
@@ -486,7 +498,7 @@ function newPattern() {
         "number": 0,
         "duration": 0,
         "description": '',
-        "id": 0
+        "patternId": 0
     };
     pattern.type = $("input#inputPatternType").val();
     pattern.description = $("#inputDescription").val();

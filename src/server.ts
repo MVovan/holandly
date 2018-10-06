@@ -6,63 +6,33 @@ import sessionStore from 'memorystore';
 import * as userController from "./controllers/user";
 import * as userModel from "./models/user";
 import morgan from 'morgan';
+import { userRouter } from "./routes/user";
+
+
+const app = express();
 
 userModel.dbConnect;
 
 const memoryStore = sessionStore(session);
 
-const app = express();
+
+app.use(session({
+    secret: 'waffle',
+    resave: false,
+    saveUninitialized: true,
+    store: new memoryStore({
+      checkPeriod: 86400000
+    })
+  }))
 
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(morgan(':method :url :status :res[content-length]'));
 
-
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({
-  secret: 'waffle',
-  resave: false,
-  saveUninitialized: true,
-  store: new memoryStore({
-    checkPeriod: 86400000
-  })
-}))
+app.use('/', userRouter)
 
-app.get('/login', (req: Request, res: Response) => {
-  res.set("WWW-Authenticate", "Basic")
-  res.sendFile(path.join(__dirname, 'public/login/Signin.html'));
-})
-
-app.post('/login', userModel.validateUser);
-
-
-app.get("/", userController.requireLogin);
-
-app.get('/logout', userController.stopSession);
-
-
-/*Returns all the scheduled events info */
-app.get('/scheduled', userModel.sendScheduledEvents);
-
-/* Returns all the existing event patterns */
-app.get('/pattern', userModel.sendEventPatterns)
-
-//sort by id and data time
-app.get('/events', userModel.sendAvailableEvents)
-
-/* adds new pattern */
-app.post('/pattern', userModel.addNewEventPattern)
-
-
-/* deletes the pattern by id specified in params, and then deletes all the events  */
-app.delete('/pattern/*', userModel.deleteEventPattern)
-
-app.delete('/event/*', userModel.deleteEvent)
-
-app.delete('/cancel', userModel.deleteEventVisitor)
-
-app.post('/events', userModel.addEvent)
 
 app.listen(8130, () => {
     console.log('wat up');

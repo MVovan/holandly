@@ -30,6 +30,7 @@ export const dbConnect = mysql.createConnection({
         if(usr.length > 0) {
           if (req.body.password == usr[0].password) {
             req.session.user = req.body;
+            req.session.user.id = usr[0].userId;
             delete req.session.user.password;
             res.status(200).json();
             
@@ -119,7 +120,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
       } else if(results.length > 0) {
         results.forEach(function(entry: any) {
             let eventObject: any = {};
-            eventObject.id = entry.id;
+            eventObject.patternId = entry.patternId;
             eventObject.type = entry.type;
             eventObject.number = entry.number;
             eventObject.duration = entry.duration;
@@ -145,7 +146,7 @@ export let sendEventPatterns = (req: Request, res: Response) => {
       } else if(results.length > 0) {
         results.forEach(function(entry: any) {
           let eventObject: any = {};
-          eventObject.id = entry.id;
+          eventObject.eventId = entry.eventId;
           eventObject.time = entry.time;
           eventObject.type = entry.type;
           eventObject.date = entry.date;
@@ -162,15 +163,31 @@ export let sendEventPatterns = (req: Request, res: Response) => {
   }
 
   export let addNewEventPattern = (req: Request, res: Response) => {
-    let pattern: any[] = [req.body.type, req.body.number, req.body.duration, req.body.description
-      , req.body.type, req.body.number, req.body.duration];
+    let user = req.session.user.id;
+    let type = req.body.type;
+    let pattern: any[] = [type, req.body.number, req.body.duration, req.body.description, user
+      , type, user];
     //console.log(pattern);
-    dbConnect.query(`insert into eventpattern (type, number, duration, description)
-                      select ?, ?, ?, ?
+    dbConnect.query(`insert into eventpattern (type, number, duration, description, userId)
+                      select ?, ?, ?, ?, ?
                       where not exists (select * from eventpattern where
-                      (type=? and number=? and duration=?));`, pattern,
+                      (type=? and userId = ?));`, pattern, 
     function(err: any, results: any, fields: any) {
       
+      if(err) {
+        console.log(err);
+        res.json("Data retrieval failed");
+      } else {
+        console.log(results.affectedRows)
+        res.json("Successful");
+      }
+    })
+  }
+  //new method to update existing pattern details
+  export let updateEventPattern = (req: Request, res: Response) => {
+    let patternType: any = req.body.type;
+    delete req.body.type;
+    dbConnect.query(`update eventpattern set ? where type=?`, [req.body, patternType], function(err: any, results: any, fields: any) {
       if(err) {
         console.log(err);
         res.json("Data retrieval failed");
@@ -222,9 +239,9 @@ export let sendEventPatterns = (req: Request, res: Response) => {
   export let addEvent = (req: Request, res: Response) => {
     console.log(req.session);
     let event: any = req.body;
-    delete event[0].reason;
+    delete event[0].reason; //the reason is saved on front end in the form
     console.log(req.body);
-    console.log(event[0].time +"" + event[0].date);
+    console.log(event[0].time + "" + event[0].date);
     dbConnect.query(`insert into eventslist SET ? ON DUPLICATE KEY UPDATE time=?,date=?, patternId=?`
                       ,[event[0], event[0].time, event[0].date, event[0].patternId] , function(err: MysqlError, results: any, fields: any) {
       if(err) {

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-
+import { Request, Response } from "express";
 import path from 'path';
+
 
 export let requireLogin = (req: Request, res: Response) => {
     console.log(req.session.user);
@@ -11,7 +11,6 @@ export let requireLogin = (req: Request, res: Response) => {
     }
 }
 
-
 export let stopSession = (req: Request, res: Response) => {
         console.log(req.session.user);
         req.session.destroy(function(err: Error) {
@@ -19,3 +18,8 @@ export let stopSession = (req: Request, res: Response) => {
         })
         res.redirect("/");
     }
+
+export let getLoginPage = (req: Request, res: Response) => {
+    res.set("WWW-Authenticate", "Basic")
+    res.sendFile(path.join(__dirname, '../public/login/Signin.html'));
+  }

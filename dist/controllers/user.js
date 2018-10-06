@@ -7,7 +7,6 @@ const path_1 = __importDefault(require("path"));
 exports.requireLogin = (req, res) => {
     console.log(req.session.user);
     if (!req.session.user) {
-        res.set("WWW-Authenticate", "Basic");
         res.redirect('/login');
     }
     else {
@@ -21,5 +20,9 @@ exports.stopSession = (req, res) => {
             throw err;
     });
     res.redirect("/");
+};
+exports.getLoginPage = (req, res) => {
+    res.set("WWW-Authenticate", "Basic");
+    res.sendFile(path_1.default.join(__dirname, '../public/login/Signin.html'));
 };
 //# sourceMappingURL=user.js.map

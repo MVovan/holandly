@@ -11,6 +11,17 @@ exports.dbConnect = mysql_1.default.createConnection({
     database: 'holandly'
 });
 exports.validateUser = (req, res) => {
+    /* let authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.setHeader('WWW-Authenticate', 'Basic');
+      res.status(401).json("Unauthorized");
+      return;
+    }
+
+    let auth = new Buffer(authHeader.split(' ')[1], 'base64').toString().split(':');
+    let user = auth[0];
+    let pass = auth[1];
+    */
     exports.dbConnect.query('select * from holandly.users where login=?', [req.body.email], function (err, usr, fields) {
         if (err) {
             console.log(err);
@@ -19,6 +30,7 @@ exports.validateUser = (req, res) => {
             if (usr.length > 0) {
                 if (req.body.password == usr[0].password) {
                     req.session.user = req.body;
+                    req.session.user.id = usr[0].userId;
                     delete req.session.user.password;
                     res.status(200).json();
                 }
@@ -105,7 +117,7 @@ exports.sendEventPatterns = (req, res) => {
         else if (results.length > 0) {
             results.forEach(function (entry) {
                 let eventObject = {};
-                eventObject.id = entry.id;
+                eventObject.patternId = entry.patternId;
                 eventObject.type = entry.type;
                 eventObject.number = entry.number;
                 eventObject.duration = entry.duration;
@@ -131,7 +143,7 @@ exports.sendAvailableEvents = (req, res) => {
         else if (results.length > 0) {
             results.forEach(function (entry) {
                 let eventObject = {};
-                eventObject.id = entry.id;
+                eventObject.eventId = entry.eventId;
                 eventObject.time = entry.time;
                 eventObject.type = entry.type;
                 eventObject.date = entry.date;
@@ -148,13 +160,30 @@ exports.sendAvailableEvents = (req, res) => {
     });
 };
 exports.addNewEventPattern = (req, res) => {
-    let pattern = [req.body.type, req.body.number, req.body.duration, req.body.description,
-        req.body.type, req.body.number, req.body.duration];
+    let user = req.session.user.id;
+    let type = req.body.type;
+    let pattern = [type, req.body.number, req.body.duration, req.body.description, user,
+        type, user];
     //console.log(pattern);
-    exports.dbConnect.query(`insert into eventpattern (type, number, duration, description)
-                      select ?, ?, ?, ?
+    exports.dbConnect.query(`insert into eventpattern (type, number, duration, description, userId)
+                      select ?, ?, ?, ?, ?
                       where not exists (select * from eventpattern where
-                      (type=? and number=? and duration=?));`, pattern, function (err, results, fields) {
+                      (type=? and userId = ?));`, pattern, function (err, results, fields) {
+        if (err) {
+            console.log(err);
+            res.json("Data retrieval failed");
+        }
+        else {
+            console.log(results.affectedRows);
+            res.json("Successful");
+        }
+    });
+};
+//new method to update existing pattern details
+exports.updateEventPattern = (req, res) => {
+    let patternType = req.body.type;
+    delete req.body.type;
+    exports.dbConnect.query(`update eventpattern set ? where type=?`, [req.body, patternType], function (err, results, fields) {
         if (err) {
             console.log(err);
             res.json("Data retrieval failed");
@@ -206,7 +235,7 @@ exports.deleteEventVisitor = (req, res) => {
 exports.addEvent = (req, res) => {
     console.log(req.session);
     let event = req.body;
-    delete event[0].reason;
+    delete event[0].reason; //the reason is saved on front end in the form
     console.log(req.body);
     console.log(event[0].time + "" + event[0].date);
     exports.dbConnect.query(`insert into eventslist SET ? ON DUPLICATE KEY UPDATE time=?,date=?, patternId=?`, [event[0], event[0].time, event[0].date, event[0].patternId], function (err, results, fields) {
