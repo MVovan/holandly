@@ -420,20 +420,28 @@ function makePatternCard(data) {
         let pattenn = data[i];
         var patternCard = document.createElement('div');
         patternCard.id = 'pattern' + pattenn.id;
-        patternCard.data = {'patternId': pattenn.id, 'patternType': pattenn.type};
+        patternCard.data = pattenn;
         patternCard.classList.add('col-sm-4');
         patternCard.innerHTML +=
             '<div class = "card border-primary mb-4">' +
             '<div class = "card-header">' +
-            '<button id="btnGroupDrop2" type="button" class="btn btn-link dropdown-toggle"' +
-            '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-            '<strong>' + pattenn.type + '</strong>' +
-            '</button>' +
-            '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-            '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
-            '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
+            '<div style="float: left"><strong>' + pattenn.type + '</strong>' +
+            '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a></div>' +
+
+            '<div class=" rounded float-right ">' +
+            '<img src="../login/EventAdd.png" class="img-fluid btn-outline-success newEvent" href="#" data-toggle="modal" data-target="#newEventModal">' +
+            '<img src="../login/PatternEdit.png" class="img-fluid btn-outline-info editPattern" href="#" data-toggle="modal" data-target="#newPatternModal">' +
+            '<img src="../login/PatternDelete.png" class="img-fluid btn-outline-danger delPater" href="#" data-toggle="modal" data-target="#removeModal">' +
             '</div>' +
-            '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
+            // '<button id="btnGroupDrop2" type="button" class="btn btn-link dropdown-toggle"' +
+            // '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+            // '<strong>' + pattenn.type + '</strong>' +
+            // '</button>' +
+            // '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+            // '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
+            // '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
+            // '</div>' +
+            // '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
             '</div>' +
             '<div class = "card-body text-primary">' +
             '<p class="card-text">' + pattenn.description + '</p>' +
@@ -446,7 +454,7 @@ function makePatternCard(data) {
     }
     $("#pattern-row .newEvent").click(
         function () {
-            let data = this.parentNode.parentNode.parentNode.parentNode.data;
+            let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.data;
             console.log(data);
             data.eventId = 0;
             data.reason = true;
@@ -456,12 +464,22 @@ function makePatternCard(data) {
     );
     $("#pattern-row .delPater").click(
         function () {
-            let data = this.parentNode.parentNode.parentNode.parentNode.data;
+            let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.data;
             console.log(data);
             $('.removeId').click(
                 function () {
                     deletePattern(data.patternId, $("#removeDescription").val());
                 });
+        }
+    );
+    $("#pattern-row .editPattern").click(
+        function () {
+            let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.data;
+            console.log(data);
+            $("input#inputPatternType").val(data.type);
+            $("#inputDescription").val(data.description);
+            $("input#inputNumber").val(data.number);
+            $("input#inputDuration").val(data.duration);
         }
     );
 }
