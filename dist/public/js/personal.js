@@ -420,42 +420,8 @@ function getPatterns() {
 }
 
 function makePatternCard(data) {
-    let patternField = document.getElementById('pattern-row');
+    var patternField = document.getElementById('pattern-row');
     patternField.innerHTML = '';
-<<<<<<< HEAD
-    let patternAmount = 0;
-    document.getElementById('pattern-amount').innerText = 0;
-    if (typeof data === "object") {
-        patternAmount = data.length;
-        for (let i = 0; i < data.length; i++) {
-            let pattenn = data[i];
-            var patternCard = document.createElement('div');
-            patternCard.id = 'pattern' + pattenn.patternId;
-            patternCard.data = {'patternId': pattenn.patternId, 'patternType': pattenn.type};
-            patternCard.classList.add('col-sm-4');
-            patternCard.innerHTML +=
-                '<div class = "card border-primary mb-4">' +
-                '<div class = "card-header">' +
-                '<button id="btnGroupDrop2" type="button" class="btn btn-link dropdown-toggle"' +
-                '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                '<strong>' + pattenn.type + '</strong>' +
-                '</button>' +
-                '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-                '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
-                '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
-                '</div>' +
-                '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
-                '</div>' +
-                '<div class = "card-body text-primary">' +
-                '<p class="card-text">' + pattenn.description + '</p>' +
-                '<h6 class="card-title">Количество учасников: ' + pattenn.number + '</h6>\n' +
-                '<h6 class="card-title">Продолжительность: ' + pattenn.duration + ' мин</h6>';
-            // '<button type="button" class="btn btn-primary"' +
-            // 'data-toggle="modal" data-target="#newEventModal">' +
-            // ' +Добавить в расписание </button>';
-            patternField.appendChild(patternCard);
-        }
-=======
     document.getElementById('pattern-amount').innerText = data.length;
     for (let i = 0; i < data.length; i++) {
         let pattenn = data[i];
@@ -492,7 +458,6 @@ function makePatternCard(data) {
         // 'data-toggle="modal" data-target="#newEventModal">' +
         // ' +Добавить в расписание </button>';
         patternField.appendChild(patternCard);
->>>>>>> 3beb0df8cecc3038e7cb5a12c5a1b437e98ba45c
     }
     document.getElementById('pattern-amount').innerText = patternAmount;
     $("#pattern-row .newEvent").click(
