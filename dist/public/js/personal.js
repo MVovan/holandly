@@ -423,44 +423,29 @@ function makePatternCard(data) {
     let patternField = document.getElementById('pattern-row');
     patternField.innerHTML = '';
     let patternAmount = '';
-    document.getElementById('pattern-amount').innerText = '';
     if(typeof data === "object") {
         patternAmount = data.length;
-
         for (let i = 0; i < data.length; i++) {
-            let pattenn = data[i];
+            let patten = data[i];
             let patternCard = document.createElement('div');
-            patternCard.id = 'pattern' + pattenn.id;
-            patternCard.data = pattenn;
+            patternCard.id = 'pattern' + patten.id;
+            patternCard.data = patten;
             patternCard.classList.add('col-sm-4');
             patternCard.innerHTML +=
                 '<div class = "card border-primary mb-4">' +
                 '<div class = "card-header">' +
-                '<div style="float: left"><strong>' + pattenn.type + '</strong>' +
-                '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a></div>' +
-
+                '<div style="float: left"><strong>' + patten.type + '</strong>' +
+                // '<span class="badge badge-primary">id:' + patternCard.data.patternId + '</span></a>'+
+                '</div>' +
                 '<div class=" rounded float-right ">' +
                 '<img src="../login/EventAdd.png" class="img-fluid btn-outline-success ico newEvent" href="#" data-toggle="modal" data-target="#newEventModal">' +
                 '<img src="../login/PatternEdit.png" class="img-fluid btn-outline-info ico editPattern" href="#" data-toggle="modal" data-target="#newPatternModal">' +
-                '<img src="../login/PatternDelete.png" class="img-fluid btn-outline-danger delPater" href="#" data-toggle="modal" data-target="#removeModal">' +
-                '</div>' +
-                // '<button id="btnGroupDrop2" type="button" class="btn btn-link dropdown-toggle"' +
-                // '       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                // '<strong>' + pattenn.type + '</strong>' +
-                // '</button>' +
-                // '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-                // '<a class="dropdown-item newEvent" href="#" data-toggle="modal" data-target="#newEventModal"> Добавить в расписание</a>' +
-                // '<a class="dropdown-item delPater" href="#" data-toggle="modal" data-target="#removeModal">Удалить</a>' +
-                // '</div>' +
-                // '<span class="badge badge-warning">' + patternCard.data.patternId + '</span></a>' +
-                '</div>' +
+                '<img src="../login/PatternDelete.png" class="img-fluid btn-outline-danger ico delPater" href="#" data-toggle="modal" data-target="#removeModal">' +
+                '</div></div>' +
                 '<div class = "card-body text-primary">' +
-                '<p class="card-text">' + pattenn.description + '</p>' +
-                '<h6 class="card-title">Количество учасников: ' + pattenn.number + '</h6>\n' +
-                '<h6 class="card-title">Продолжительность: ' + pattenn.duration + ' мин</h6>';
-            // '<button type="button" class="btn btn-primary"' +
-            // 'data-toggle="modal" data-target="#newEventModal">' +
-            // ' +Добавить в расписание </button>';
+                '<p class="card-text">' + patten.description + '</p>' +
+                '<h6 class="card-title">Количество учасников: ' + patten.number + '</h6>\n' +
+                '<h6 class="card-title">Продолжительность: ' + patten.duration + ' мин</h6>';
             patternField.appendChild(patternCard);
         }
     }
@@ -487,17 +472,26 @@ function makePatternCard(data) {
     );
     $("#pattern-row .editPattern").click(
         function () {
-            let data = this.parentNode.parentNode.parentNode.parentNode.parentNode.data;
+            let data = this.parentNode.parentNode.parentNode.parentNode.data;
             console.log(data);
             $("input#inputPatternType").val(data.type);
             $("#inputDescription").val(data.description);
             $("input#inputNumber").val(data.number);
             $("input#inputDuration").val(data.duration);
+            $("input#modalPattern_patternId").val(data.patternId);
         }
     );
 }
 
-function putPattern(pattern) {
+function putPattern() {
+    let pattern ={};
+    pattern.patternId = $("input#modalPattern_patternId").val();
+    pattern.type = $("input#inputPatternType").val();
+    pattern.description = $("#inputDescription").val();
+    pattern.number = $("input#inputNumber").val();
+    pattern.duration = $("input#inputDuration").val();
+    console.log('POST putPattern');
+    console.log(pattern);
     $.ajax({
         type: "POST",
         url: '/pattern',
@@ -505,6 +499,7 @@ function putPattern(pattern) {
         data: JSON.stringify(pattern),
         contentType: 'application/json',
         success: function (data) {
+            console.log('POST putPattern<<<');
             console.log(data);
             getPatterns();
         }
@@ -512,18 +507,20 @@ function putPattern(pattern) {
 }
 
 function newPattern() {
-    let pattern = {
-        "type": '',
-        "number": 0,
-        "duration": 0,
-        "description": '',
-        "patternId": 0
-    };
-    pattern.type = $("input#inputPatternType").val();
-    pattern.description = $("#inputDescription").val();
-    pattern.number = $("input#inputNumber").val();
-    pattern.duration = $("input#inputDuration").val();
-    putPattern(pattern);
+    // let pattern = {
+    //     "type": '',
+    //     "number": 0,
+    //     "duration": 0,
+    //     "description": '',
+    //     "patternId": 0
+    // };
+    $("input#modalPattern_patternId").val('0');
+    // pattern.patternId = $("input#modalPattern_patternId").val();
+    // pattern.type = $("input#inputPatternType").val();
+    // pattern.description = $("#inputDescription").val();
+    // pattern.number = $("input#inputNumber").val();
+    // pattern.duration = $("input#inputDuration").val();
+    putPattern();
 }
 
 function deletePattern(id, description) {
