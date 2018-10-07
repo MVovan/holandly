@@ -437,9 +437,9 @@ function makePatternCard(data) {
                 // '<span class="badge badge-primary">id:' + patternCard.data.patternId + '</span></a>'+
                 '</div>' +
                 '<div class=" rounded float-right ">' +
-                '<img src="../login/EventAdd.png" class="img-fluid btn-outline-success ico newEvent" href="#" data-toggle="modal" data-target="#newEventModal">' +
-                '<img src="../login/PatternEdit.png" class="img-fluid btn-outline-info ico editPattern" href="#" data-toggle="modal" data-target="#newPatternModal">' +
-                '<img src="../login/PatternDelete.png" class="img-fluid btn-outline-danger ico delPater" href="#" data-toggle="modal" data-target="#removeModal">' +
+                '<img src="../login/EventAdd.png" class="img-fluid btn-outline-success ico newEvent" href="#" data-tooltip="tooltip" title="Заплпнировать событие" data-toggle="modal" data-target="#newEventModal">' +
+                '<img src="../login/PatternEdit.png" class="img-fluid btn-outline-info ico editPattern" href="#" data-tooltip="tooltip" title="Редактировать шаблон" data-toggle="modal" data-target="#newPatternModal">' +
+                '<img src="../login/PatternDelete.png" class="img-fluid btn-outline-danger ico delPater" href="#" data-tooltip="tooltip" title="Удалить шаблон" data-toggle="modal" data-target="#removeModal">' +
                 '</div></div>' +
                 '<div class = "card-body text-primary">' +
                 '<p class="card-text">' + patten.description + '</p>' +
@@ -449,6 +449,11 @@ function makePatternCard(data) {
         }
     }
     document.getElementById('pattern-amount').innerText = patternAmount;
+
+    $(document).ready(function(){
+        $('[data-tooltip="tooltip"]').tooltip();
+    });
+
     $("#pattern-row .newEvent").click(
         function () {
             let data = this.parentNode.parentNode.parentNode.parentNode.data;
