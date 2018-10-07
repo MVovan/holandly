@@ -183,12 +183,13 @@ export let sendEventPatterns = (req: Request, res: Response) => {
       }
     })
   }
-  //new method to update existing pattern details
+  //new method to update existing pattern details   and p.duration=? and p.description=? , req.body.duration, req.body.description
   export let updateEventPattern = (req: Request, res: Response) => {
     let patternId: any = req.body.patternId;
     delete req.body.patternId;
-    dbConnect.query(`update eventpattern set ? where patternId=?
-                    where not exists (select * from eventpattern where (type=? and userId=?))`
+    dbConnect.query(`update eventpattern set ?
+                    where patternId=? and not exists (select * from
+                    (select * from holandly.eventpattern p where (p.type=? and p.userId=? )) as tmp)`
                     , [req.body, patternId, req.body.type, req.session.user.id], function(err: any, results: any, fields: any) {
       if(err) {
         console.log(err);
