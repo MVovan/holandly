@@ -179,12 +179,13 @@ exports.addNewEventPattern = (req, res) => {
         }
     });
 };
-//new method to update existing pattern details
+//new method to update existing pattern details   and p.duration=? and p.description=? , req.body.duration, req.body.description
 exports.updateEventPattern = (req, res) => {
     let patternId = req.body.patternId;
     delete req.body.patternId;
-    exports.dbConnect.query(`update eventpattern set ? where patternId=?
-                    where not exists (select * from eventpattern where (type=? and userId=?))`, [req.body, patternId, req.body.type, req.session.user.id], function (err, results, fields) {
+    exports.dbConnect.query(`update eventpattern set ?
+                    where patternId=? and not exists (select * from
+                    (select * from holandly.eventpattern p where (p.type=? and p.userId=? )) as tmp)`, [req.body, patternId, req.body.type, req.session.user.id], function (err, results, fields) {
         if (err) {
             console.log(err);
             res.json("Data retrieval failed");
