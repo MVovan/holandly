@@ -16,12 +16,12 @@ block content
             ul.date-bar
                 - list = days
                 - for (var i = 0; i < list.length-1; i++)
-                if list[i].available
-                    li.active= list[i].date
-                    .divider
-                else
-                    li= list[i].date
-                    .divider
+                    if list[i].available
+                        li.active= list[i].date
+                        .divider
+                    else
+                        li= list[i].date
+                        .divider
                 if list[list.length-1].available
                     li.active= list[list.length-1].date
                 else
