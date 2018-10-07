@@ -23,19 +23,11 @@ userRouter.route("/events")
 userRouter.route('/pattern')
 .get(userModel.sendEventPatterns)
 .post(userModel.addNewEventPattern)
+.put(userModel.updateEventPattern)
   
   /*Returns all the scheduled events info */
 userRouter.get('/scheduled', userModel.sendScheduledEvents);
-  
-  /* Returns all the existing event patterns */
-
-  
-  //sort by id and data time
-  //userRouter.get('/events/available', userModel.sendAvailableEvents)
-  
-  /* adds new pattern */
  
-  
   /* deletes the pattern by id specified in params, and then deletes all the events  */
 userRouter.delete('/pattern/*', userModel.deleteEventPattern)
   

@@ -185,9 +185,11 @@ export let sendEventPatterns = (req: Request, res: Response) => {
   }
   //new method to update existing pattern details
   export let updateEventPattern = (req: Request, res: Response) => {
-    let patternType: any = req.body.type;
-    delete req.body.type;
-    dbConnect.query(`update eventpattern set ? where type=?`, [req.body, patternType], function(err: any, results: any, fields: any) {
+    let patternId: any = req.body.patternId;
+    delete req.body.patternId;
+    dbConnect.query(`update eventpattern set ? where patternId=?
+                    where not exists (select * from eventpattern where (type=? and userId=?))`
+                    , [req.body, patternId, req.body.type, req.session.user.id], function(err: any, results: any, fields: any) {
       if(err) {
         console.log(err);
         res.json("Data retrieval failed");
