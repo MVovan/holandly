@@ -1,4 +1,3 @@
-
 window.onload = function () {
     console.log('------------------>');
     $(function () {
@@ -327,7 +326,7 @@ function makeEventsPoint(data) {
         }
     }
 
-        document.getElementById('event-amount').innerText = eventAmount;
+    document.getElementById('event-amount').innerText = eventAmount;
     $("#div-event .updateEvent").click(
         function () {
             let data = this.parentNode.parentNode.data;
@@ -423,7 +422,7 @@ function makePatternCard(data) {
     let patternField = document.getElementById('pattern-row');
     patternField.innerHTML = '';
     let patternAmount = '';
-    if(typeof data === "object") {
+    if (typeof data === "object") {
         patternAmount = data.length;
         for (let i = 0; i < data.length; i++) {
             let patten = data[i];
@@ -484,22 +483,22 @@ function makePatternCard(data) {
 }
 
 function putPattern() {
-    let pattern ={};
+    let pattern = {};
     pattern.patternId = $("input#modalPattern_patternId").val();
     pattern.type = $("input#inputPatternType").val();
     pattern.description = $("#inputDescription").val();
     pattern.number = $("input#inputNumber").val();
     pattern.duration = $("input#inputDuration").val();
-    console.log('POST putPattern');
+    console.log('/pattern>>>');
     console.log(pattern);
     $.ajax({
-        type: "POST",
+        type: (pattern.patternId === "0") ? "POST" : "PUT",
         url: '/pattern',
         dataType: 'json',
         data: JSON.stringify(pattern),
         contentType: 'application/json',
         success: function (data) {
-            console.log('POST putPattern<<<');
+            console.log('/pattern<<<');
             console.log(data);
             getPatterns();
         }
@@ -507,19 +506,7 @@ function putPattern() {
 }
 
 function newPattern() {
-    // let pattern = {
-    //     "type": '',
-    //     "number": 0,
-    //     "duration": 0,
-    //     "description": '',
-    //     "patternId": 0
-    // };
     $("input#modalPattern_patternId").val('0');
-    // pattern.patternId = $("input#modalPattern_patternId").val();
-    // pattern.type = $("input#inputPatternType").val();
-    // pattern.description = $("#inputDescription").val();
-    // pattern.number = $("input#inputNumber").val();
-    // pattern.duration = $("input#inputDuration").val();
     putPattern();
 }
 
