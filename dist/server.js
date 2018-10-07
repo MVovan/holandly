@@ -34,6 +34,7 @@ app.use(body_parser_1.default.text());
 app.use(morgan_1.default(':method :url :status :res[content-length]'));
 app.use(express_1.default.static(path_1.default.join(__dirname, 'public')));
 app.use('/', user_1.userRouter);
+app.use('/user');
 app.listen(8130, () => {
     console.log('wat up');
 });

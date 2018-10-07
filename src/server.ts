@@ -33,6 +33,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', userRouter)
 
+app.use('/user')
+
+
+
 
 app.listen(8130, () => {
     console.log('wat up');
