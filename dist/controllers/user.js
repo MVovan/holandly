@@ -23,6 +23,6 @@ exports.stopSession = (req, res) => {
 };
 exports.getLoginPage = (req, res) => {
     res.set("WWW-Authenticate", "Basic");
-    res.sendFile(path_1.default.join(__dirname, '../public/login/Signin.html'));
+    res.sendFile(path_1.default.join(__dirname, '../public/login/signIn.html'));
 };
 //# sourceMappingURL=user.js.map
