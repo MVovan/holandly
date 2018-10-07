@@ -18,8 +18,8 @@ var igorDB = {
     database: "shppcalendly"
 };
 
-// var con = mysql.createConnection(igorDB);
-var con = mysql.createConnection(borisDB);
+var con = mysql.createConnection(igorDB);
+// var con = mysql.createConnection(borisDB);
 
 con.connect(function(err) {
     if (err) throw err;
@@ -137,8 +137,6 @@ router.get('/getTimeLine/:date/:patternId', function (req, res, next) {
 });
 
 router.post('/submitVisitor', function (req, res, next) {
-    // var vname = req.params.name;
-    // var vemail = req.params.email;
     let vname = req.body.name;
     let vemail = req.body.email;
     let eventId = req.body.event;
@@ -155,7 +153,7 @@ router.post('/submitVisitor', function (req, res, next) {
             if (err) throw err;
             if (possibility.length == 0 || possibility[0].number - possibility[0].amount < 1) {   // recording possibility  = false
                 console.log('Sorry...');
-                res.render('index', {success: false, name: vname, email: vemail});
+                res.json({success: false, name: vname, email: vemail});
             }
             else {                                                                                // recording possibility  = true
                 //   input visitor ( + uniqueness check)
@@ -205,7 +203,7 @@ router.post('/submitVisitor', function (req, res, next) {
                                                 }
                                                 else {
                                                     console.log('Success!');
-                                                    res.render('index', {success: true, name: vname, email: vemail});
+                                                    res.json({success: true, name: vname, email: vemail});
                                                 }
                                             });
                                     });
@@ -214,7 +212,7 @@ router.post('/submitVisitor', function (req, res, next) {
                     }
                             else {   //  visitor has already recorded on this event
                                 console.log("You've already recorded on this event.");
-                                res.render('index', {success: true, name: vname, email: vemail});
+                                res.json({success: true, name: vname, email: vemail});
                             }
                         });
                     });
