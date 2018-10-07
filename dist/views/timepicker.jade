@@ -1,0 +1,53 @@
+extends layout
+
+block content
+    #patternId= patternId
+    #eventDuration= duration
+    .timeline
+        .head
+            .event-owner= userName
+        .event-header
+            .top_container
+                #event-name= eventType
+                #event-duarion= '⌚   ' + duration + ' min'
+            #event-description= description
+        .timeline-content
+            span.backward ❮
+            ul.date-bar
+                - list = days
+                - for (var i = 0; i < list.length-1; i++)
+                if list[i].available
+                    li.active= list[i].date
+                    .divider
+                else
+                    li= list[i].date
+                    .divider
+                if list[list.length-1].available
+                    li.active= list[list.length-1].date
+                else
+                    li= list[list.length-1].date
+            span.forward ❯
+        .time-container
+            ul
+    .submit-modal
+        .submit-content
+            #modal-owner= userName
+            .modal-inner
+                .modal-right
+                    .modal-description
+                        #modal-event= eventType
+                        #modal-description= description
+                    .modal-time
+                        #modal-start
+                        #modal-duration= "Длительность: " + duration + ' мин'
+                .modal-left
+                    form
+                        h3 Для подтвердждения записи на событие ведите ваши данные
+                        p Введите фамилию и имя:
+                        input#visitorName
+                        p Введите e-mail
+                        input#visitorEmail(type='email', placeholder="Введите действующий e-mail адрес" pattern='/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$/\n', required=true)
+                        p.modal-confirm Записаться
+
+    script(src="/javascripts/jquery-3.3.1.min.js")
+    script(src='/javascripts/date-time-handler.js')
