@@ -7,7 +7,7 @@ const mysql_1 = __importDefault(require("mysql"));
 exports.dbConnect = mysql_1.default.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    password: 'admin',
+    password: '0',
     database: 'holandly'
 });
 exports.validateUser = (req, res) => {
