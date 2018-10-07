@@ -26,16 +26,12 @@ exports.userRouter.route("/events")
     .post(userModel.addEvent);
 exports.userRouter.route('/pattern')
     .get(userModel.sendEventPatterns)
-    .post(userModel.addNewEventPattern);
+    .post(userModel.addNewEventPattern)
+    .put(userModel.updateEventPattern);
 /*Returns all the scheduled events info */
 exports.userRouter.get('/scheduled', userModel.sendScheduledEvents);
-/* Returns all the existing event patterns */
-//sort by id and data time
-//userRouter.get('/events/available', userModel.sendAvailableEvents)
-/* adds new pattern */
 /* deletes the pattern by id specified in params, and then deletes all the events  */
 exports.userRouter.delete('/pattern/*', userModel.deleteEventPattern);
 exports.userRouter.delete('/events/*', userModel.deleteEvent);
 exports.userRouter.delete('/cancel', userModel.deleteEventVisitor);
-//userRouter.post('/events', )
 //# sourceMappingURL=user.js.map

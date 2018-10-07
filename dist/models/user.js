@@ -181,9 +181,10 @@ exports.addNewEventPattern = (req, res) => {
 };
 //new method to update existing pattern details
 exports.updateEventPattern = (req, res) => {
-    let patternType = req.body.type;
-    delete req.body.type;
-    exports.dbConnect.query(`update eventpattern set ? where id=?`, [req.body, patternType], function (err, results, fields) {
+    let patternId = req.body.patternId;
+    delete req.body.patternId;
+    exports.dbConnect.query(`update eventpattern set ? where patternId=?
+                    where not exists (select * from eventpattern where (type=? and userId=?))`, [req.body, patternId, req.body.type, req.session.user.id], function (err, results, fields) {
         if (err) {
             console.log(err);
             res.json("Data retrieval failed");

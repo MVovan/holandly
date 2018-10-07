@@ -34,5 +34,3 @@ userRouter.delete('/pattern/*', userModel.deleteEventPattern)
 userRouter.delete('/events/*', userModel.deleteEvent)
   
 userRouter.delete('/cancel', userModel.deleteEventVisitor)
-  
-  //userRouter.post('/events', )
